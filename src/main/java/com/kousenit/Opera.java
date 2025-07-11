@@ -18,7 +18,7 @@ public record Opera(
                     number,
                     title.replaceAll("\\s+", "_").toLowerCase());
         }
-        
+
         public String getImageFileName() {
             return String.format("scene_%d_illustration.png", number);
         }

@@ -14,20 +14,20 @@ import java.util.List;
  * Uses Google's Gemini model to provide literary criticism of generated operas.
  */
 public class OperaCritic {
-    
+
     private final ChatModel gemini = AiModels.GEMINI_FLASH_25;
-    
+
     /**
      * Generate a critical review of an opera libretto.
-     * 
+     *
      * @param librettoPath Path to the libretto markdown file
-     * @param operaTitle The title of the opera
+     * @param operaTitle   The title of the opera
      * @return The critical review as a string
      */
     public String reviewOpera(Path librettoPath, String operaTitle) throws IOException {
         // Read the libretto content
         String librettoContent = Files.readString(librettoPath);
-        
+
         // Create the critique prompt
         String query = String.format("""
                 Write a detailed literary critique of the following
@@ -50,7 +50,7 @@ public class OperaCritic {
                 
                 %s
                 """, operaTitle, librettoContent);
-        
+
         // Get Gemini's critique
         ChatResponse response = gemini.chat(
                 List.of(
@@ -65,24 +65,24 @@ public class OperaCritic {
                         UserMessage.from(query)
                 )
         );
-        
+
         return response.aiMessage().text();
     }
-    
+
     /**
      * Save a critique to a markdown file in the opera's directory.
-     * 
-     * @param critique The critique text
-     * @param operaDir The directory containing the opera files
+     *
+     * @param critique   The critique text
+     * @param operaDir   The directory containing the opera files
      * @param operaTitle The title of the opera
      */
     public void saveCritique(String critique, Path operaDir, String operaTitle) throws IOException {
         String filename = operaTitle.toLowerCase()
-                .replaceAll("[^a-z0-9\\s]", "")
-                .replaceAll("\\s+", "_") + "_critique.md";
-        
+                                  .replaceAll("[^a-z0-9\\s]", "")
+                                  .replaceAll("\\s+", "_") + "_critique.md";
+
         Path critiquePath = operaDir.resolve(filename);
-        
+
         // Format the critique as markdown
         String formattedCritique = String.format("""
                 # Critical Review: %s
@@ -93,11 +93,11 @@ public class OperaCritic {
                 
                 %s
                 """, operaTitle, critique);
-        
+
         Files.writeString(critiquePath, formattedCritique);
         System.out.println("📝 Critique saved to: " + critiquePath.getFileName());
     }
-    
+
     /**
      * Review an opera and save the critique.
      */
@@ -108,33 +108,32 @@ public class OperaCritic {
                         .replaceAll("[^a-z0-9\\s]", "")
                         .replaceAll("\\s+", "_") + "_complete_libretto.md"
         );
-        
+
         if (!Files.exists(librettoPath)) {
             throw new IOException("Libretto file not found: " + librettoPath);
         }
-        
+
         System.out.println("🎭 Generating critical review with Google Gemini...");
         String critique = reviewOpera(librettoPath, operaTitle);
-        
+
         System.out.println("\n" + "=".repeat(60));
         System.out.println("CRITICAL REVIEW");
         System.out.println("=".repeat(60));
         System.out.println(critique);
         System.out.println("=".repeat(60) + "\n");
-        
+
         saveCritique(critique, operaDir, operaTitle);
     }
-    
+
     public static void main(String[] args) {
         try {
             OperaCritic critic = new OperaCritic();
             Path operaDir = Path.of("src/main/resources/hartford_ascending_an_opera_of_love_and_ruins");
             String operaTitle = "Hartford Ascending: An Opera of Love and Ruins";
-            
+
             critic.reviewAndSave(operaDir, operaTitle);
         } catch (IOException e) {
             System.err.println("Error generating critique: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 }

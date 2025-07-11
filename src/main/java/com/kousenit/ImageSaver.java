@@ -22,7 +22,7 @@ public class ImageSaver {
 
     /**
      * Save the image from a LangChain4j Image Response to a directory
-     * 
+     *
      * @param imageResponse The Response<Image> from an image generation model
      * @param directoryPath The directory where the image should be saved (must exist)
      * @return The path to the saved image file, or null if saving failed
@@ -31,21 +31,21 @@ public class ImageSaver {
         // Generate a unique filename
         String filename = "generated_image_" + UUID.randomUUID() + ".png";
         Path outputPath = Paths.get(directoryPath, filename);
-        
+
         // Check if the directory exists
         if (!Files.exists(Paths.get(directoryPath)) || !Files.isDirectory(Paths.get(directoryPath))) {
             System.err.println("Directory doesn't exist: " + directoryPath);
             return null;
         }
-        
+
         // Try to save the image
         Image image = imageResponse.content();
-        
+
         // 1. Try base64 data first
         String base64Data = image.base64Data();
         if (base64Data != null && !base64Data.isEmpty()) {
             return saveBase64Image(base64Data, outputPath);
-        } 
+        }
         // 2. Fall back to URL if available
         else if (image.url() != null) {
             return downloadAndSaveImage(image.url().toString(), outputPath);
@@ -54,7 +54,7 @@ public class ImageSaver {
             return null;
         }
     }
-    
+
     /**
      * Save an image from its base64 encoded data
      */
@@ -69,20 +69,19 @@ public class ImageSaver {
             return null;
         }
     }
-    
+
     /**
      * Download and save an image from a URL
      */
     private static Path downloadAndSaveImage(String imageUrl, Path outputPath) {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
+        try (var client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(imageUrl))
                     .build();
-            
-            HttpResponse<byte[]> response = client.send(request, 
+
+            HttpResponse<byte[]> response = client.send(request,
                     HttpResponse.BodyHandlers.ofByteArray());
-            
+
             if (response.statusCode() == 200) {
                 Files.write(outputPath, response.body());
                 System.out.println("Image downloaded and saved to: " + outputPath);

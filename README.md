@@ -90,7 +90,8 @@ src/main/resources/opera_title/
 
 - **AI Collaboration**: GPT-4.1 and Claude alternate writing scenes, creating unique stylistic variety
 - **Visual Storytelling**: Each scene gets an AI-generated illustration based on its content
-- **Professional Formatting**: Proper opera formatting with stage directions, character names, and sung lyrics
+- **Automatic Formatting**: Beautiful stanza formatting applied automatically when scenes are saved
+- **Professional Layout**: Proper opera formatting with stage directions, character names, and sung lyrics
 - **Critical Review**: Optional AI-generated critique by Google Gemini acting as an opera critic
 - **Rate Limiting**: Intelligent throttling prevents API rate limit issues
 - **Modern Java**: Uses Java 21 features including virtual threads for efficient concurrent processing
@@ -126,7 +127,7 @@ Key components:
 - `IntegratedOperaGenerator` - Main orchestration class
 - `Conversation` - Manages AI model interactions
 - `OperaImageGenerator` - Handles illustration generation with rate limiting
-- `LibrettoWriter` - Formats and saves opera content
+- `LibrettoWriter` - Formats and saves opera content with automatic stanza formatting
 - `OperaCritic` - Generates critical reviews using Google Gemini
 - `ContinueHartfordOperaTest` - Example of continuing unfinished operas
 - `Opera` - Domain model using Java records with nested Scene records
@@ -136,12 +137,11 @@ Key components:
 - **Timeout errors**: The system includes 3-minute timeouts for image generation
 - **Rate limiting**: Images are generated with controlled concurrency (max 2 at a time)
 - **Missing API keys**: Ensure environment variables are set before running
-- **Markdown rendering**: Use the `LIBRETTO_FORMATTING_GUIDE.md` for proper stanza formatting
+- **Formatting issues**: Stanza formatting is now automatic - no manual intervention needed
 - **Duplicate scenes**: Check continuation directory if you see duplicate files
 
 ## Documentation
 
-- **`LIBRETTO_FORMATTING_GUIDE.md`** - Complete guide for formatting opera lyrics with proper stanzas
 - **`CLAUDE.md`** - Technical context for AI assistant development
 - **`EXECUTION_GUIDE.md`** - Step-by-step execution instructions
 
