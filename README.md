@@ -103,8 +103,8 @@ Key components:
 
 ## License
 
-[Your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-[Your contribution guidelines here]
+Contributions are welcome! Please feel free to submit a Pull Request.
