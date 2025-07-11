@@ -22,6 +22,6 @@ public class AiModels {
 
     public static final ChatModel GEMINI_FLASH_25 = GoogleAiGeminiChatModel.builder()
             .apiKey(ApiKeys.GOOGLEAI_API_KEY)
-            .modelName("models/gemini-2.5-flash")
+            .modelName("gemini-2.5-flash")
             .build();
 }
