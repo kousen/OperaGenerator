@@ -59,20 +59,6 @@ public class IntegratedOperaGenerator {
                 try {
                     OperaCritic critic = new OperaCritic();
                     Path operaDir = librettoPath.getParent();
-                    
-                    // First organize the files into a proper directory
-                    String folderName = opera.title().toLowerCase()
-                            .replaceAll("[^a-z0-9\\s]", "")
-                            .replaceAll("\\s+", "_");
-                    if (!operaDir.getFileName().toString().equals(folderName)) {
-                        // Need to organize files first
-                        OperaOrganizer.organizeOpera(
-                                opera.title().toLowerCase().replaceAll("\\s+", "_"),
-                                opera.title()
-                        );
-                        operaDir = Paths.get(LibrettoWriter.RESOURCE_PATH, folderName);
-                    }
-                    
                     critic.reviewAndSave(operaDir, opera.title());
                     System.out.println("✅ Critical review generated\n");
                 } catch (Exception e) {

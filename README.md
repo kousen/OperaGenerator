@@ -7,8 +7,10 @@ An AI-powered opera generation system that creates complete libretti with illust
 This application generates original operas by:
 - Alternating between GPT-4.1 and Claude Sonnet 4 to write scenes
 - Automatically generating illustrations for each scene using gpt-image-1
-- Creating properly formatted libretti with embedded images
+- Creating properly formatted libretti with embedded images and beautiful stanza formatting
 - Organizing all assets into a structured directory
+- Continuing and completing unfinished operas
+- Providing AI-generated critical reviews
 
 ## Prerequisites
 
@@ -47,6 +49,24 @@ java -cp build/classes/java/main com.kousenit.IntegratedOperaGenerator
 java -cp build/classes/java/main com.kousenit.IntegratedOperaGenerator "My Opera Title" 7
 ```
 
+### Generate Opera Critique
+
+Use the opera critic to review your completed libretto:
+
+```bash
+# Run the critic test (requires GOOGLEAI_API_KEY)
+./gradlew test --tests OperaCriticTest
+```
+
+### Continue an Unfinished Opera
+
+For operas that need additional scenes to complete their story:
+
+```bash
+# Run the continuation test
+./gradlew test --tests ContinueHartfordOperaTest
+```
+
 ### What Gets Generated
 
 The system creates:
@@ -75,13 +95,24 @@ src/main/resources/opera_title/
 - **Rate Limiting**: Intelligent throttling prevents API rate limit issues
 - **Modern Java**: Uses Java 21 features including virtual threads for efficient concurrent processing
 
-## Example Opera
+## Featured Opera: "Hartford Ascending: An Opera of Love and Ruins"
 
-The system can generate operas on any theme. The default premise involves:
-- A post-climate change Connecticut transformed into jungle
-- A soprano explorer searching for the lost city of Hartford
-- A tenor poet living in the wilderness
-- A baritone government agent with a robot that sings opera
+The project includes a complete 8-scene opera with beautiful libretto formatting:
+
+**Story**: Set in post-climate change Connecticut where jungle has reclaimed the land
+- **Sandra** (soprano): An explorer seeking the lost city of Hartford  
+- **Lucian** (tenor): A jungle poet who falls in love with Sandra
+- **Maximilian** (baritone): A government agent trying to stop them
+- **Aria-7 Robot** (bass): Maximilian's AI that sings opera in multiple languages
+
+**Highlights**:
+- Complete narrative arc from meeting to triumphant finale
+- Stunning AI-generated illustrations for all 8 scenes
+- Professional libretto formatting with proper stanza display
+- Critical review praising its "fearless embrace of the bizarre"
+- Themes of love, nature, technology, and transformation
+
+**Location**: `src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/`
 
 ## Performance
 
@@ -94,15 +125,25 @@ The system can generate operas on any theme. The default premise involves:
 Key components:
 - `IntegratedOperaGenerator` - Main orchestration class
 - `Conversation` - Manages AI model interactions
-- `OperaImageGenerator` - Handles illustration generation
+- `OperaImageGenerator` - Handles illustration generation with rate limiting
 - `LibrettoWriter` - Formats and saves opera content
-- `Opera` - Domain model using Java records
+- `OperaCritic` - Generates critical reviews using Google Gemini
+- `ContinueHartfordOperaTest` - Example of continuing unfinished operas
+- `Opera` - Domain model using Java records with nested Scene records
 
 ## Troubleshooting
 
 - **Timeout errors**: The system includes 3-minute timeouts for image generation
 - **Rate limiting**: Images are generated with controlled concurrency (max 2 at a time)
 - **Missing API keys**: Ensure environment variables are set before running
+- **Markdown rendering**: Use the `LIBRETTO_FORMATTING_GUIDE.md` for proper stanza formatting
+- **Duplicate scenes**: Check continuation directory if you see duplicate files
+
+## Documentation
+
+- **`LIBRETTO_FORMATTING_GUIDE.md`** - Complete guide for formatting opera lyrics with proper stanzas
+- **`CLAUDE.md`** - Technical context for AI assistant development
+- **`EXECUTION_GUIDE.md`** - Step-by-step execution instructions
 
 ## License
 
