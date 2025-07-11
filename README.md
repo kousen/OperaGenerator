@@ -17,6 +17,7 @@ This application generates original operas by:
 - API keys for:
   - OpenAI (for GPT-4.1 and image generation)
   - Anthropic (for Claude Sonnet 4)
+  - Google AI (optional, for opera critique feature)
 
 ## Setup
 
@@ -24,6 +25,7 @@ This application generates original operas by:
    ```bash
    export OPENAI_API_KEY=your_openai_key
    export ANTHROPIC_API_KEY=your_anthropic_key
+   export GOOGLEAI_API_KEY=your_google_ai_key  # Optional, for critique feature
    ```
 
 2. Build the project:
@@ -69,6 +71,7 @@ src/main/resources/opera_title/
 - **AI Collaboration**: GPT-4.1 and Claude alternate writing scenes, creating unique stylistic variety
 - **Visual Storytelling**: Each scene gets an AI-generated illustration based on its content
 - **Professional Formatting**: Proper opera formatting with stage directions, character names, and sung lyrics
+- **Critical Review**: Optional AI-generated critique by Google Gemini acting as an opera critic
 - **Rate Limiting**: Intelligent throttling prevents API rate limit issues
 - **Modern Java**: Uses Java 21 features including virtual threads for efficient concurrent processing
 

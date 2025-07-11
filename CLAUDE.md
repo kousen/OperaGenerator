@@ -33,7 +33,8 @@ src/main/java/com/kousenit/
 ├── ImageSaver.java               # Handles base64 and URL image saving
 ├── AiModels.java                 # Model configurations
 ├── ApiKeys.java                  # Environment variable access
-└── OperaOrganizer.java          # Utility for organizing completed operas
+├── OperaOrganizer.java          # Utility for organizing completed operas
+└── OperaCritic.java             # Generates critical reviews using Gemini
 ```
 
 ### Workflow
@@ -43,6 +44,7 @@ src/main/java/com/kousenit/
 3. **LibrettoWriter** saves markdown and individual scene files
 4. **OperaImageGenerator** creates illustrations with rate limiting
 5. **OperaOrganizer** can reorganize files and create complete libretti
+6. **OperaCritic** (optional) generates critical review using Gemini
 
 ### Testing Commands
 

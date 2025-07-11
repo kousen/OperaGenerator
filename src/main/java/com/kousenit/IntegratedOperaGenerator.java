@@ -1,6 +1,8 @@
 package com.kousenit;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class IntegratedOperaGenerator {
     
@@ -50,6 +52,33 @@ public class IntegratedOperaGenerator {
                 System.out.printf("   • %s%n", scene.getFileName());
                 System.out.printf("   • %s%n", scene.getImageFileName());
             });
+            
+            // Optional: Generate a critical review (requires Google AI API key)
+            if (System.getenv("GOOGLEAI_API_KEY") != null) {
+                System.out.println("\n📰 Step 5: Generating critical review...");
+                try {
+                    OperaCritic critic = new OperaCritic();
+                    Path operaDir = librettoPath.getParent();
+                    
+                    // First organize the files into a proper directory
+                    String folderName = opera.title().toLowerCase()
+                            .replaceAll("[^a-z0-9\\s]", "")
+                            .replaceAll("\\s+", "_");
+                    if (!operaDir.getFileName().toString().equals(folderName)) {
+                        // Need to organize files first
+                        OperaOrganizer.organizeOpera(
+                                opera.title().toLowerCase().replaceAll("\\s+", "_"),
+                                opera.title()
+                        );
+                        operaDir = Paths.get(LibrettoWriter.RESOURCE_PATH, folderName);
+                    }
+                    
+                    critic.reviewAndSave(operaDir, opera.title());
+                    System.out.println("✅ Critical review generated\n");
+                } catch (Exception e) {
+                    System.out.println("⚠️  Could not generate critique: " + e.getMessage());
+                }
+            }
             
         } catch (IOException e) {
             System.err.println("❌ Error during opera generation: " + e.getMessage());
