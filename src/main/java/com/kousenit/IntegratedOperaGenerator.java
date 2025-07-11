@@ -22,15 +22,10 @@ public class IntegratedOperaGenerator {
             System.out.printf("\n✅ Generated opera: \"%s\" with %d scenes\n\n", 
                              opera.title(), opera.scenes().size());
             
-            // Step 2: Save the complete libretto as Markdown
-            System.out.println("💾 Step 2: Saving complete libretto to markdown...");
-            var librettoPath = LibrettoWriter.saveLibretto(opera);
-            System.out.println("✅ Libretto saved\n");
-            
-            // Step 3: Save individual scene files  
-            System.out.println("📄 Step 3: Creating individual scene files...");
-            LibrettoWriter.saveScenesToFiles(opera);
-            System.out.println("✅ Scene files created\n");
+            // Step 2: Save complete opera with organized directory and formatting
+            System.out.println("💾 Step 2: Saving complete opera with automatic stanza formatting...");
+            var librettoPath = LibrettoWriter.saveCompleteOpera(opera);
+            System.out.println("✅ Opera saved with beautiful formatting\n");
             
             // Step 4: Generate illustrations for each scene
             System.out.println("🎨 Step 4: Generating illustrations for each scene...");
