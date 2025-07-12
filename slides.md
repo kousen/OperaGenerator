@@ -73,14 +73,18 @@ Kousen IT, Inc.
 
 # The AI Orchestra 🎼
 
+<div style="position: absolute; top: 60px; right: 40px; opacity: 0.9;">
+  <img src="./src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/scene_8_illustration.png" alt="Scene 8: Finale - The New Dawn" style="height: 200px; border-radius: 10px; border: 2px solid #333;" />
+</div>
+
 <v-clicks>
 
-- **Text Generation**: GPT-4 + Claude writing scenes
+- **Text Generation**: GPT-4.1 + Claude Sonnet 4 writing scenes
 - **Image Generation**: OpenAI's gpt-image-1 creating illustrations  
 - **Music Generation**: Suno AI composing arias
 - **Voice Narration**: ElevenLabs reading stage directions
 - **Audio Content**: NotebookLM discussing the opera
-- **Critical Review**: Gemini as opera critic
+- **Critical Review**: Gemini 2.5 Flash as opera critic
 - **All Orchestrated** with Modern Java
 
 </v-clicks>
@@ -114,11 +118,11 @@ Traditional approach: One model, one task
 // Boring! Same voice throughout
 ChatLanguageModel model = OpenAiChatModel.builder()
     .apiKey(apiKey)
-    .modelName("gpt-4-turbo-preview")
+    .modelName("gpt-4.1")
     .build();
 ```
 
-Our approach: Multiple models alternating
+Our approach: Multiple models alternating scenes
 
 ```java
 // Exciting! Different perspectives
@@ -133,6 +137,34 @@ model = (i % 2 == 0) ? gpt4 : claude;
 
 ---
 
+# Enter LangChain4j 🔗
+
+<v-clicks>
+
+**The Java Framework for AI Integration**
+
+- **Unified API** - Same interface for OpenAI, Anthropic, Google, etc.
+- **Memory Management** - Built-in conversation history
+- **Modern Java** - Records, virtual threads, functional style
+- **Production Ready** - Error handling, retries, timeouts
+
+```java
+// One interface, multiple models
+ChatLanguageModel gpt = OpenAiChatModel.builder()
+    .apiKey(apiKey).modelName("gpt-4.1").build();
+
+ChatLanguageModel claude = AnthropicChatModel.builder()  
+    .apiKey(apiKey).modelName("claude-sonnet-4-20250514").build();
+
+// Same methods, different providers!
+String response1 = gpt.generate("Write an opera scene");
+String response2 = claude.generate("Continue the story");
+```
+
+</v-clicks>
+
+---
+
 # Setting Up Multiple Models
 
 ```java
@@ -140,7 +172,7 @@ public class AiModels {
     public static ChatLanguageModel getOpenAiModel() {
         return OpenAiChatModel.builder()
             .apiKey(ApiKeys.OPENAI_API_KEY)
-            .modelName("gpt-4-0125-preview")
+            .modelName("gpt-4.1")
             .temperature(0.7)
             .timeout(ofSeconds(60))
             .build();
@@ -149,7 +181,7 @@ public class AiModels {
     public static ChatLanguageModel getAnthropicModel() {
         return AnthropicChatModel.builder()
             .apiKey(ApiKeys.ANTHROPIC_API_KEY)
-            .modelName("claude-3-5-sonnet-20241022")
+            .modelName("claude-sonnet-4-20250514")
             .temperature(0.7)
             .build();
     }
@@ -184,34 +216,47 @@ Solution: **ChatMemory** from LangChain4j!
 
 # Implementing Shared Memory
 
+<div class="grid grid-cols-2 gap-6">
+
+<div>
+
+**The Pattern**
+- Start with premise
+- Alternate between models  
+- Each sees full history
+- Memory auto-manages
+
+</div>
+
+<div>
+
 ```java
 public class Conversation {
-    private final ChatMemory chatMemory = 
-        MessageWindowChatMemory.withMaxMessages(20);
+    private final ChatMemory memory = 
+        MessageWindowChatMemory
+            .withMaxMessages(20);
     
-    public Opera generateOpera(String title, int numberOfScenes) {
-        List<ChatMessage> messages = new ArrayList<>();
+    public Opera generateOpera(String title, int scenes) {
+        // Add premise
+        memory.add(new SystemMessage(PREMISE));
         
-        // Add the premise as system message
-        messages.add(new SystemMessage(PREMISE));
-        
-        for (int i = 1; i <= numberOfScenes; i++) {
-            // Choose model based on scene number
-            ChatLanguageModel model = (i % 2 == 1) 
+        for (int i = 1; i <= scenes; i++) {
+            // Alternate models
+            var model = (i % 2 == 1) 
                 ? AiModels.getOpenAiModel() 
                 : AiModels.getAnthropicModel();
             
-            // Generate with shared memory
-            Response<AiMessage> response = model.generate(
-                chatMemory.messages()
-            );
-            
-            // Update shared memory
-            chatMemory.add(response.content());
+            // Generate with full context
+            var response = model.generate(memory.messages());
+            memory.add(response.content());
         }
     }
 }
 ```
+
+</div>
+
+</div>
 
 ---
 
@@ -525,6 +570,95 @@ AudioPlayer.play(audioFile);
 
 ---
 
+# The AI Opera Critic 🎭
+
+<div style="position: absolute; top: 20px; right: 20px; opacity: 0.9;">
+  <img src="./src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/scene_1_illustration.png" alt="Scene 1: Encounter Beneath the Banyan Trees" style="height: 180px; border-radius: 10px; border: 2px solid #444;" />
+</div>
+
+<v-clicks>
+
+**Problem**: Every opera needs a critic's review
+
+**Solution**: Gemini 2.5 Flash as Anton Ego
+
+```java
+public class OperaCritic {
+    private final ChatLanguageModel model = GoogleAiGeminiChatModel.builder()
+        .apiKey(ApiKeys.GOOGLEAI_API_KEY)
+        .modelName("gemini-2.0-flash-exp")
+        .temperature(0.8)  // More creative for criticism
+        .build();
+    
+    public void reviewAndSave(Path operaDir, String operaTitle) {
+        String prompt = """
+            You are a distinguished opera critic in the tradition of 
+            the great critics of the past. Review this AI-generated opera 
+            with wit, insight, and perhaps a touch of theatrical flair...
+            """;
+    }
+}
+```
+
+</v-clicks>
+
+---
+
+# AI Critic in Action 📰
+
+<v-clicks>
+
+**Sample Review** (Gemini 2.5 Flash on Hartford Ascending):
+
+> *"Hartford Ascending is a triumph of absurdist opera, blending environmental catastrophe with mechanical madness in a way that only AI could conceive..."*
+
+> *"The robot's multilingual arias are particularly memorable, though one wonders if Verdi is spinning in his grave..."*
+
+> *"This fearless embrace of the bizarre creates something genuinely entertaining."*
+
+**Key Features**:
+- Understands opera conventions and traditions
+- Provides both praise and constructive criticism  
+- Captures the theatrical voice of a seasoned critic
+- Saves review as markdown alongside the opera
+
+</v-clicks>
+
+---
+
+# AI Podcast with NotebookLM 🎙️
+
+<div style="position: absolute; top: 20px; right: 20px; opacity: 0.9;">
+  <img src="./src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/notebooklm.png" alt="NotebookLM Interface" style="height: 180px; border-radius: 10px; border: 2px solid #444;" />
+</div>
+
+<v-clicks>
+
+**Problem**: Need expert analysis of our AI-generated opera
+
+**Solution**: NotebookLM creates AI podcast hosts
+
+- Upload **all opera files** (libretto, scenes, critique, images)
+- NotebookLM **analyzes everything** 
+- Generates **14+ minute podcast** with two AI hosts
+- Discusses themes, characters, artistic merits
+- **"Two Guys Talking"** format about our opera
+
+```bash
+# What NotebookLM received:
+- Complete 8-scene libretto
+- Individual scene files  
+- Critical review
+- Audio narration files
+- Scene illustrations
+```
+
+**Result**: Professional analysis of Hartford Ascending! 🎭
+
+</v-clicks>
+
+---
+
 # Automated Formatting = Time Saved
 
 <v-clicks>
@@ -566,7 +700,7 @@ Let's generate and play an opera together...
 <v-clicks>
 
 **The Complete Workflow:**
-1. Generate scene with GPT-4/Claude ✅
+1. Generate scene with GPT-4.1/Claude Sonnet 4 ✅
 2. Create illustration with gpt-image-1 ✅ 
 3. Generate narrator audio with ElevenLabs ✅
 4. **Play the audio live!** 🎵 ✅
@@ -586,45 +720,41 @@ Let's generate and play an opera together...
 
 # The Complete AI Orchestra 🎼
 
-<div class="grid grid-cols-2 gap-4">
+<div style="position: absolute; top: 60px; right: 20px; opacity: 0.85;">
+  <img src="./src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/scene_3_illustration.png" alt="Scene 3: Heartbeats and Warning Calls" style="height: 160px; border-radius: 8px; border: 2px solid #444;" />
+</div>
+
+<div class="grid grid-cols-2 gap-6">
 
 <div>
 
 **Automated Pipeline** (Java)
-- GPT-4: Scenes 1, 3, 5, 7 ✅
-- Claude 3.5: Scenes 2, 4, 6, 8 ✅
-- gpt-image-1: 8 illustrations ✅
-- ElevenLabs: Scene narrations ✅
-- Gemini: Critical review ✅
+- GPT-4.1: Odd scenes ✅
+- Claude Sonnet 4: Even scenes ✅
+- gpt-image-1: All illustrations ✅
+- ElevenLabs: Narrations ✅
+- Gemini 2.5 Flash: Critique ✅
 
 </div>
 
 <div>
 
-**Manual Enrichment**
-- **Suno AI**: Musical arias ✅
-  - Sandra & Lucian's duet ✅
-  - Robot's multilingual rage (pending)
-  - Final love duet (pending)
-  
-- **NotebookLM**: AI Podcast 
-  - Upload complete opera files
-  - AI hosts discuss themes
-  - "Two Guys Talking" format
+**External Enrichment**
+- **Suno AI**: Opera music ✅
+- **NotebookLM**: 14-min AI podcast ✅
+- **Live Performance**: Java orchestration
 
 </div>
 
 </div>
+
+<br>
 
 <v-click>
 
-**Result**: A complete multimedia opera experience! 🎭
+**Result**: Complete multimedia opera experience! 🎭
 
-**Live Demo Assets:**
-- 🎵 AI narrator introduction (ElevenLabs + Java)
-- 🎼 Actual opera duet music (Suno AI) 
-- 🎨 Scene illustrations (gpt-image-1)
-- 📖 Complete 8-scene libretto (GPT-4 + Claude)
+**🎵 AI narrator • 🎼 Opera music • 🎨 Scene art • 📖 8-scene libretto**
 
 </v-click>
 
@@ -708,12 +838,12 @@ Let's generate and play an opera together...
 
 ## Each AI tool is like an instrument:
 
-- **GPT-4/Claude**: The composers (libretto)
+- **GPT-4.1/Claude Sonnet 4**: The composers (libretto)
 - **gpt-image-1**: The set designer (visuals)
 - **Suno**: The musicians (musical arias)
 - **ElevenLabs + JLayer**: The narrator (stage directions + playback)
-- **NotebookLM**: The critics (analysis)
-- **Gemini**: The reviewer (critique)
+- **NotebookLM**: The podcast hosts (analysis)
+- **Gemini 2.5 Flash**: The reviewer (critique)
 - **Java**: The conductor (orchestration)
 
 ## Key insight:
@@ -724,27 +854,49 @@ Let's generate and play an opera together...
 
 ---
 
-# Resources & Links
+# APIs & Technologies 🛠️
+
+<v-clicks>
+
+## AI APIs Used (All Working!)
+- **OpenAI**: GPT-4.1 & gpt-image-1 ✅
+- **Anthropic**: Claude Sonnet 4 ✅
+- **Google**: Gemini 2.5 Flash ✅  
+- **ElevenLabs**: Voice narration ✅
+- **Suno AI**: Opera music ✅
+
+## Java Features Showcased
+- **Virtual Threads** (JDK 21) ✅
+- **Records & Pattern Matching** ✅
+- **Text Blocks** ✅
+- **HttpClient** (JDK 11+) ✅
+- **JLayer** for Audio Playback ✅
+
+</v-clicks>
+
+---
+layout: default
+---
+
+# Resources & Links 📚
 
 <v-clicks>
 
 ## Code & Documentation
-- GitHub: [github.com/kousen/OperaGenerator](https://github.com/kousen/OperaGenerator)
-- LangChain4j: [docs.langchain4j.dev](https://docs.langchain4j.dev)
+- **GitHub**: [github.com/kousen/OperaGenerator](https://github.com/kousen/OperaGenerator)
+- **LangChain4j**: [docs.langchain4j.dev](https://docs.langchain4j.dev)
+- **Slidev**: [sli.dev](https://sli.dev) (for this presentation)
 
-## APIs Used (All Working!)
-- OpenAI GPT-4 & gpt-image-1 ✅
-- Anthropic Claude 3.5 Sonnet ✅
-- Google Gemini (for critique) ✅  
-- ElevenLabs (for narration) ✅
-- Suno AI (for music) ✅
+## Hartford Ascending Assets
+- **AI-Generated Podcast**: [NotebookLM Discussion](./src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/Hartford%20Ascending_Scene%201%20option%201.mp3) (14+ minutes)
+- **Complete Libretto**: Available in the GitHub repository
+- **Scene Illustrations**: All 8 AI-generated images included
 
-## Java Features Showcased
-- Virtual Threads (JDK 21) ✅
-- Records & Pattern Matching ✅
-- Text Blocks ✅
-- HttpClient (JDK 11+) ✅
-- JLayer for Audio Playback ✅
+## Try It Yourself
+- Clone the repository
+- Set your API keys
+- Run: `./gradlew test --tests AudioDemoTest`
+- Generate your own AI opera! 🎭
 
 </v-clicks>
 
@@ -757,10 +909,19 @@ class: text-center
 
 Questions?
 
+<div class="mt-8">
+
+**GitHub Issues for feature requests**  
+**Contributions welcome!**  
+**Let's discuss AI orchestration!**
+
+</div>
+
 <br>
 
-Ken Kousen
-[@kenkousen](https://twitter.com/kenkousen)
+Ken Kousen  
+[@kousenit.com](https://bsky.app/profile/kousenit.com)  
+[ken.kousen@kousenit.com](mailto:ken.kousen@kousenit.com)
 
 <br>
 
