@@ -4,10 +4,12 @@ This document provides context for Claude when working on the Opera Generator pr
 
 ## Project Overview
 
-This is an AI-powered opera generation system built with Java 21 and LangChain4j 1.1.0. The system creates complete operas by:
+This is an AI-powered opera generation system built with Java 21 and LangChain4j 1.1.0. The system creates complete multimedia operas by:
 1. Using GPT-4.1 and Claude Sonnet 4 to alternately write scenes
 2. Generating illustrations with OpenAI's gpt-image-1 model
-3. Creating formatted libretti with embedded images
+3. Creating dramatic voice narration with ElevenLabs text-to-speech
+4. Playing audio with JLayer for live demonstrations
+5. Creating formatted libretti with embedded images and automatic stanza formatting
 
 ## Key Technical Details
 
@@ -21,6 +23,8 @@ This is an AI-powered opera generation system built with Java 21 and LangChain4j
 - **gpt-image-1**: Returns base64-encoded images (not URLs), no revised prompt, no token usage info
 - **Image generation timeout**: Set to 3 minutes due to slow response times
 - **Rate limiting**: Max 2 concurrent image requests with 1-second delays to avoid API throttling
+- **ElevenLabs**: Uses HttpClient for API calls, streams audio directly to files
+- **Voice IDs**: Bella (narrator) and Antoni (critic) for different character voices
 
 ### Project Structure
 ```
@@ -28,12 +32,13 @@ src/main/java/com/kousenit/
 ├── IntegratedOperaGenerator.java  # Main entry point
 ├── Opera.java                     # Domain model (Opera and Scene records)
 ├── Conversation.java              # AI scene generation logic
-├── LibrettoWriter.java           # File output handling
+├── LibrettoWriter.java           # File output handling with automatic formatting
 ├── OperaImageGenerator.java      # Image generation with rate limiting
 ├── ImageSaver.java               # Handles base64 and URL image saving
+├── NarratorVoice.java            # ElevenLabs voice narration
+├── AudioPlayer.java              # JLayer audio playback
 ├── AiModels.java                 # Model configurations
 ├── ApiKeys.java                  # Environment variable access
-├── OperaOrganizer.java          # Utility for organizing completed operas
 └── OperaCritic.java             # Generates critical reviews using Gemini
 ```
 
@@ -41,10 +46,11 @@ src/main/java/com/kousenit/
 
 1. **IntegratedOperaGenerator** orchestrates the entire process
 2. **Conversation** generates scenes alternating between AI models
-3. **LibrettoWriter** saves markdown and individual scene files
+3. **LibrettoWriter** saves markdown and individual scene files with automatic formatting
 4. **OperaImageGenerator** creates illustrations with rate limiting
-5. **OperaOrganizer** can reorganize files and create complete libretti
-6. **OperaCritic** (optional) generates critical review using Gemini
+5. **NarratorVoice** generates dramatic audio narration using ElevenLabs
+6. **AudioPlayer** plays generated audio for live demonstrations
+7. **OperaCritic** (optional) generates critical review using Gemini
 
 ### Testing Commands
 
@@ -55,6 +61,10 @@ src/main/java/com/kousenit/
 # Run specific tests
 ./gradlew test --tests ImageModelTest
 ./gradlew test --tests OperaGenerationIntegrationTest
+
+# Audio generation and playback (requires ELEVENLABS_API_KEY)
+./gradlew test --tests AudioDemoTest::generateAndPlayOperaIntroduction
+./gradlew test --tests NarratorVoiceTest
 
 # Compile and run main class directly
 ./gradlew compileJava
@@ -127,15 +137,21 @@ Must have these environment variables set:
 - `OPENAI_API_KEY`
 - `ANTHROPIC_API_KEY`
 - `GOOGLEAI_API_KEY` (only for critique functionality)
+- `ELEVENLABS_API_KEY` (only for voice narration)
 
 ### Useful Patterns
 
-```text
+```java
 // Rate-limited image generation
 OperaImageGenerator.generateImages(opera);
 
 // Generate opera with custom parameters
 Opera opera = conversation.generateOpera(title, numberOfScenes);
+
+// Generate and play audio narration
+NarratorVoice narrator = new NarratorVoice();
+Path audioFile = narrator.generateOperaIntroduction(opera, outputDir);
+AudioPlayer.play(audioFile);
 
 // Continue an opera (from ContinueHartfordOperaTest pattern)
 String continuationContext = premise + """
@@ -145,9 +161,16 @@ String continuationContext = premise + """
     """;
 Opera continuation = conversation.generateOpera(title, continuationContext, 3);
 
-// Copy continuation files to main directory
-cp src/main/resources/continuation/*.txt src/main/resources/main_opera/
-mv src/main/resources/scene_*_illustration.png src/main/resources/main_opera/
+// HttpClient pattern for ElevenLabs integration
+var request = HttpRequest.newBuilder()
+    .uri(URI.create(API_URL + voiceId))
+    .header("xi-api-key", ELEVENLABS_API_KEY)
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+    .build();
+
+// Stream directly to file - efficient for large audio files
+var response = client.send(request, HttpResponse.BodyHandlers.ofFile(outputPath));
 ```
 
 ### Continuation Test Pattern
@@ -174,3 +197,12 @@ The `formatSceneContent()` method automatically:
 - `formatSceneContent(String content)` - Main formatting logic
 - `determineVoiceType(String character)` - Voice type detection
 - `saveCompleteOpera(Opera opera)` - Saves with automatic formatting
+
+**Key Methods in NarratorVoice.java**:
+- `generateSceneNarration(Scene scene, Path outputDir)` - Extracts stage directions and creates audio
+- `generateOperaIntroduction(Opera opera, Path outputDir)` - Creates dramatic introduction
+- `generateAudio(String text, String voiceId, Path outputPath)` - Core ElevenLabs integration
+
+**Key Methods in AudioPlayer.java**:
+- `play(Path audioFile)` - Blocking audio playback with JLayer
+- `playAsync(Path audioFile)` - Non-blocking playback using virtual threads

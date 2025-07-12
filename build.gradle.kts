@@ -26,6 +26,12 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-anthropic")
 
     implementation("ch.qos.logback:logback-classic:1.5.18")
+    
+    // For ElevenLabs API JSON serialization
+    implementation("com.google.code.gson:gson:2.11.0")
+    
+    // For playing generated audio files
+    implementation("javazoom:jlayer:1.0.1")
 
     testImplementation(platform("org.junit:junit-bom:5.13.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
