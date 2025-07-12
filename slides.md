@@ -890,13 +890,21 @@ layout: default
 ## Hartford Ascending Assets
 - **AI-Generated Podcast**: [NotebookLM Discussion](./src/main/resources/hartford_ascending_an_opera_of_love_and_ruins/Hartford%20Ascending_Scene%201%20option%201.mp3) (14+ minutes)
 - **Complete Libretto**: Available in the GitHub repository
-- **Scene Illustrations**: All 8 AI-generated images included
 
-## Try It Yourself
+</v-clicks>
+
+---
+
+# Try It Yourself 🎭
+
+<v-clicks>
+
 - Clone the repository
-- Set your API keys
+- Set your API keys  
 - Run: `./gradlew test --tests AudioDemoTest`
-- Generate your own AI opera! 🎭
+- Generate your own AI opera!
+
+**All 8 AI-generated scene illustrations included**
 
 </v-clicks>
 
