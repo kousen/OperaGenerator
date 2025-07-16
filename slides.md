@@ -804,6 +804,55 @@ Let's generate and play an opera together...
 
 ---
 
+# AI Continuation Challenges 🎭
+
+<v-clicks>
+
+**The Good**: Our continuation prompt was well-crafted
+```java
+String continuationContext = premise + """
+    IMPORTANT CONTINUATION CONTEXT:
+    The opera has already progressed through 5 scenes...
+    Continue from Scene 6. You must complete the opera in 3 scenes...
+    """;
+```
+
+**The Problem**: Clear tonal shift in scenes 6-8
+- Original (1-5): Grounded adventure, human characters
+- Continuation (6-8): Mystical, archetypal, overblown
+
+**The Reality**: Even excellent prompting can't fully preserve creative voice consistency across generation sessions
+
+</v-clicks>
+
+---
+
+# Lessons from the Tonal Shift
+
+<v-clicks>
+
+**Original Scenes** (GPT-4.1/Claude alternating):
+```
+SANDRA: Who are you, spirit or man?
+LUCIAN: I am Lucian. Here I dwell...
+```
+
+**Continuation Scenes** (same models, different session):
+```
+SANDRA: Behold! The city lives—not lost, but transformed!
+HELENA: My daughter's daughter, welcome home at last!
+```
+
+**Key Insights**:
+- AI models struggle with creative consistency across sessions
+- Even with context, they tend to escalate toward grandiosity
+- Human creative judgment remains irreplaceable
+- This is a **feature limitation**, not a **prompting failure**
+
+</v-clicks>
+
+---
+
 # Key Takeaways
 
 <v-clicks>
@@ -827,6 +876,8 @@ Let's generate and play an opera together...
 9. **Live Audio Demos** make presentations unforgettable
 
 10. **Working end-to-end** beats theoretical examples every time
+
+11. **AI Continuation** has inherent limitations in preserving creative voice
 
 </v-clicks>
 
