@@ -32,15 +32,14 @@ public class AudioPlayer {
      * Useful when you want to continue with other operations.
      */
     public static Thread playAsync(Path audioFile) {
-        Thread audioThread = Thread.ofVirtual().start(() -> {
+
+        return Thread.ofVirtual().start(() -> {
             try {
                 play(audioFile);
             } catch (Exception e) {
                 System.err.println("❌ Error playing audio: " + e.getMessage());
             }
         });
-        
-        return audioThread;
     }
     
     /**
