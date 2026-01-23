@@ -12,6 +12,11 @@ java {
     }
 }
 
+// Required for langchain4j-agentic parameter name inference
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+}
+
 application {
     val overrideMain = project.findProperty("mainClass") as String?
     mainClass.set(overrideMain ?: "com.kousenit.OperaGeneratorApp")
@@ -31,6 +36,9 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-google-ai-gemini")
     implementation("dev.langchain4j:langchain4j-ollama")
     implementation("dev.langchain4j:langchain4j-anthropic")
+
+    // Agentic framework (experimental)
+    implementation("dev.langchain4j:langchain4j-agentic")
 
     implementation("ch.qos.logback:logback-classic:1.5.25")
     implementation("info.picocli:picocli:4.7.7")

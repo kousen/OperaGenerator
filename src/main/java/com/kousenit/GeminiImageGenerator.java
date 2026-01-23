@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class GeminiImageGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(GeminiImageGenerator.class);
-    static String RESOURCE_PATH = "src/main/resources"; // Package-private for testing
+    public static String RESOURCE_PATH = "src/main/resources";
 
     private static final String MODEL_NAME = "gemini-3-pro-image-preview";
 
