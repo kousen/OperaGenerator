@@ -32,6 +32,14 @@ public class AiModels {
             .logResponses(true)
             .build();
 
+    // High-token variant for supervisor/planner use cases where large content must be passed
+    // Logging disabled to reduce output verbosity
+    public static final ChatModel CLAUDE_OPUS_4_6_LARGE = AnthropicChatModel.builder()
+            .apiKey(ApiKeys.ANTHROPIC_API_KEY)
+            .modelName("claude-opus-4-6")
+            .maxTokens(8192)
+            .build();
+
     // Google Gemini Models (upgraded to Gemini 3.1)
     public static final ChatModel GEMINI_3_1_FLASH = GoogleAiGeminiChatModel.builder()
             .apiKey(ApiKeys.GOOGLEAI_API_KEY)

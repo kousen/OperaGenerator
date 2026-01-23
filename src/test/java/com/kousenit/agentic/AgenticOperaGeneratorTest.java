@@ -5,7 +5,6 @@ import com.kousenit.tags.ExpensiveTest;
 import com.kousenit.tags.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 
@@ -28,12 +27,12 @@ class AgenticOperaGeneratorTest {
         assertThat(opera).isNotNull();
         assertThat(opera.title()).isEqualTo("Test Agentic Opera");
         assertThat(opera.scenes()).hasSize(1);
-        assertThat(opera.scenes().get(0).author()).isIn("GPT-5.2", "Claude Opus 4.5");
-        assertThat(opera.scenes().get(0).content()).isNotEmpty();
+        assertThat(opera.scenes().getFirst().author()).isIn("GPT-5.2", "Claude Opus 4.5");
+        assertThat(opera.scenes().getFirst().content()).isNotEmpty();
 
         System.out.println("✅ Generated agentic opera: " + opera.title());
-        System.out.println("   Scene 1: " + opera.scenes().get(0).title());
-        System.out.println("   Author: " + opera.scenes().get(0).author());
+        System.out.println("   Scene 1: " + opera.scenes().getFirst().title());
+        System.out.println("   Author: " + opera.scenes().getFirst().author());
     }
 
     @Test
@@ -74,7 +73,7 @@ class AgenticOperaGeneratorTest {
     @Test
     @ExpensiveTest
     @EnabledIfEnvironmentVariable(named = "GOOGLE_API_KEY", matches = ".+")
-    void testFullProductionWorkflow(@TempDir Path tempDir) {
+    void testFullProductionWorkflow() {
         AgenticOperaGenerator generator = new AgenticOperaGenerator();
 
         // Generate a small opera
@@ -91,5 +90,45 @@ class AgenticOperaGeneratorTest {
 
         System.out.println("✅ Full production workflow complete");
         System.out.println("   Output directory: " + operaDir);
+    }
+
+    /**
+     * Test the TRUE agentic mode where the supervisor autonomously
+     * decides what to do based on a natural language request.
+     * <p>
+     * This demonstrates the key difference between:
+     * - Manual orchestration: Code decides the sequence
+     * - Agentic orchestration: LLM decides the sequence
+     */
+    @Test
+    @ExpensiveTest
+    @EnabledIfEnvironmentVariable(named = "GOOGLE_API_KEY", matches = ".+")
+    void testAutonomousSupervisorMode() {
+        AgenticOperaGenerator generator = new AgenticOperaGenerator();
+
+        // Give the supervisor a high-level request - it decides HOW to accomplish it
+        String request = "Create a 2-scene opera about the relationship between humans and AI. " +
+                "Make sure to alternate writing styles between scenes. " +
+                "After the scenes are complete, save the libretto and generate illustrations.";
+
+        System.out.println("═".repeat(60));
+        System.out.println("  🧪 TESTING AUTONOMOUS SUPERVISOR MODE");
+        System.out.println("═".repeat(60));
+        System.out.println("Request: " + request);
+        System.out.println();
+
+        // The supervisor autonomously orchestrates everything
+        String result = generator.generateOperaAutonomously(request);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isNotEmpty();
+
+        System.out.println();
+        System.out.println("─".repeat(60));
+        System.out.println("SUPERVISOR RESULT:");
+        System.out.println("─".repeat(60));
+        System.out.println(result);
+        System.out.println();
+        System.out.println("✅ Autonomous supervisor test complete");
     }
 }
