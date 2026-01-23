@@ -19,7 +19,8 @@ tasks.withType<JavaCompile> {
 
 application {
     val overrideMain = project.findProperty("mainClass") as String?
-    mainClass.set(overrideMain ?: "com.kousenit.OperaGeneratorApp")
+    // Default to AgenticOperaGenerator on this branch
+    mainClass.set(overrideMain ?: "com.kousenit.agentic.AgenticOperaGenerator")
     applicationDefaultJvmArgs = listOf("--enable-native-access=ALL-UNNAMED")
 }
 

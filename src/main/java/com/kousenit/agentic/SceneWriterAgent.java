@@ -1,16 +1,18 @@
 package com.kousenit.agentic;
 
-import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 
 /**
  * Agent interface for writing opera scenes.
  * Each scene writer can use a different LLM model for diversity.
+ *
+ * The @Agent annotation makes this usable as a sub-agent in a supervisor workflow.
  */
 public interface SceneWriterAgent {
 
-    @SystemMessage("""
+    @UserMessage("""
             You are an expert opera librettist collaborating on a dramatic opera.
             Write vivid, lyrical scenes with:
             - Clear character entrances and stage directions in [brackets]
@@ -23,8 +25,7 @@ public interface SceneWriterAgent {
             Scene X: [Evocative Scene Title]
 
             [Stage directions and character dialogue]
-            """)
-    @UserMessage("""
+
             We are collaboratively writing an opera titled "{{title}}".
 
             Premise: {{premise}}
@@ -36,6 +37,7 @@ public interface SceneWriterAgent {
 
             Provide only this scene with an evocative title and lyrical content.
             """)
+    @Agent(description = "Writes opera scenes with dramatic dialogue and stage directions")
     String writeScene(
             @V("title") String title,
             @V("premise") String premise,
