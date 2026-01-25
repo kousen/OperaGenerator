@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Tools available to the Opera Supervisor Agent.
@@ -19,8 +17,6 @@ import java.util.regex.Pattern;
  */
 public class OperaTools {
     private static final Logger logger = LoggerFactory.getLogger(OperaTools.class);
-    private static final Pattern SCENE_PATTERN = Pattern.compile(
-            "Scene\\s+(\\d+):\\s*(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE);
 
     private Opera currentOpera;
     private Path operaDirectory;
@@ -237,7 +233,7 @@ public class OperaTools {
         // Sort scenes by number and parse them
         List<Opera.Scene> scenes = collectedScenes.stream()
                 .sorted((a, b) -> Integer.compare(a.number(), b.number()))
-                .map(data -> parseScene(data.number(), data.content(), data.author()))
+                .map(data -> Opera.Scene.parse(data.number(), data.content(), data.author()))
                 .toList();
 
         // Create the Opera
@@ -249,27 +245,5 @@ public class OperaTools {
 
         return String.format("Opera '%s' built successfully with %d scenes. Ready for production workflow.",
                 title, scenes.size());
-    }
-
-    /**
-     * Parse scene content into a Scene object.
-     */
-    private Opera.Scene parseScene(int expectedNumber, String content, String author) {
-        Matcher matcher = SCENE_PATTERN.matcher(content);
-
-        if (matcher.find()) {
-            int number = expectedNumber;
-            try {
-                number = Integer.parseInt(matcher.group(1));
-            } catch (NumberFormatException e) {
-                // Use expected number
-            }
-            String title = matcher.group(2).trim();
-            String sceneContent = content.substring(matcher.end()).trim();
-            return new Opera.Scene(number, title, author, sceneContent);
-        }
-
-        // Fallback
-        return new Opera.Scene(expectedNumber, "Untitled Scene " + expectedNumber, author, content);
     }
 }

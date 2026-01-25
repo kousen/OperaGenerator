@@ -2,6 +2,8 @@ package com.kousenit;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Immutable record representing an opera with its scenes.
@@ -83,6 +85,35 @@ public record Opera(
          */
         public String getImageFileName() {
             return String.format("scene_%d_illustration.png", number);
+        }
+
+        private static final Pattern SCENE_PATTERN = Pattern.compile(
+                "Scene\\s+(\\d+):\\s*(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE);
+
+        /**
+         * Parse scene content into a Scene object.
+         *
+         * @param expectedNumber the expected scene number (used as fallback)
+         * @param content the raw scene content to parse
+         * @param author the author/model that wrote this scene
+         * @return a Scene object parsed from the content
+         */
+        public static Scene parse(int expectedNumber, String content, String author) {
+            Matcher matcher = SCENE_PATTERN.matcher(content);
+
+            if (matcher.find()) {
+                int number = expectedNumber;
+                try {
+                    number = Integer.parseInt(matcher.group(1));
+                } catch (NumberFormatException e) {
+                    // Use expected number
+                }
+                String title = matcher.group(2).trim();
+                String sceneContent = content.substring(matcher.end()).trim();
+                return new Scene(number, title, author, sceneContent);
+            }
+
+            return new Scene(expectedNumber, "Untitled Scene " + expectedNumber, author, content);
         }
     }
 }
