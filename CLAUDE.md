@@ -225,3 +225,93 @@ The `formatSceneContent()` method automatically:
 **Key Methods in AudioPlayer.java**:
 - `play(Path audioFile)` - Blocking audio playback with JLayer
 - `playAsync(Path audioFile)` - Non-blocking playback using virtual threads
+
+---
+
+## langchain4j-agentic Branch
+
+The `langchain4j-agentic` branch demonstrates the experimental langchain4j-agentic framework for building AI agent systems.
+
+### Architecture
+
+Uses a **supervisor pattern** where an autonomous supervisor agent delegates to specialized sub-agents:
+
+```
+┌─────────────────────────────────────┐
+│     SUPERVISOR AGENT                │
+│     (Claude Opus 4.5 - 8192 tokens) │
+└──────────────┬──────────────────────┘
+               │
+    ┌──────────┼──────────┐
+    ▼          ▼          ▼
+┌────────┐ ┌────────┐ ┌──────────────┐
+│GPT     │ │Claude  │ │Production    │
+│Writer  │ │Writer  │ │Agent (tools) │
+└────────┘ └────────┘ └──────────────┘
+```
+
+### Key Agentic Files
+
+```
+src/main/java/com/kousenit/agentic/
+├── AgenticOperaGenerator.java  # Main orchestrator (manual + agentic modes)
+├── OperaSupervisorAgent.java   # Supervisor interface (unused, for reference)
+├── SceneWriterAgent.java       # Scene writer interface with @Agent annotation
+├── ProductionAgent.java        # Production tasks interface with tool access
+└── OperaTools.java             # @Tool-annotated methods for production workflow
+```
+
+### Running Agentic Mode
+
+```bash
+# Default: 2 scenes with default premise
+./gradlew run
+
+# Custom scene count with default premise
+./gradlew run --args="5"
+
+# Custom request string
+./gradlew run --args="'Create a 3-scene opera about time travel'"
+
+# Manual mode (code-controlled, not agentic)
+./gradlew run --args="--manual"
+./gradlew run --args="--manual 'Title' 3"
+```
+
+### Issues Solved During Development
+
+| Issue | Symptom | Solution |
+|-------|---------|----------|
+| JSON truncation | `OutputParsingException` on large scenes | `CLAUDE_OPUS_4_5_LARGE` with `maxTokens(8192)` |
+| Tool role-playing | "Registered!" without actual tool call | ProductionAgent prompt: "MUST INVOKE THE ACTUAL TOOL" |
+| Content summarization | Libretto had summaries, not full dialogue | supervisorContext: "COMPLETE content, not summaries" |
+
+### Key Implementation Details
+
+**High-token model for supervisor** (`AiModels.java`):
+```java
+public static final ChatModel CLAUDE_OPUS_4_5_LARGE = AnthropicChatModel.builder()
+        .apiKey(ApiKeys.ANTHROPIC_API_KEY)
+        .modelName("claude-opus-4-5-20251101")
+        .maxTokens(8192)  // Required for passing full scene content in JSON
+        .build();
+```
+
+**Scene parsing moved to domain object** (`Opera.java`):
+```java
+// Static factory method on Opera.Scene - eliminates duplication
+Opera.Scene scene = Opera.Scene.parse(sceneNumber, content, authorModel);
+```
+
+### Documentation
+
+See `AGENTIC_WALKTHROUGH.md` for detailed workflow explanation with Mermaid diagrams.
+
+### Known Gradle Warning
+
+The following warning appears on every Gradle run and **cannot be suppressed** at the project level:
+```
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader...
+```
+This is a Gradle 9.x + Java 21+ infrastructure issue. The warning comes from Gradle's launcher before any configuration is read. It's harmless and will be fixed in future Gradle versions.
