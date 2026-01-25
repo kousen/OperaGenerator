@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class LibrettoWriter {
 
-    static String RESOURCE_PATH = "src/main/resources"; // Package-private for testing
+    static String RESOURCE_PATH = "production_runs"; // Package-private for testing
 
     // Pattern to match character singing lines (CHARACTER (description): or CHARACTER:)
     private static final Pattern SINGING_PATTERN = Pattern.compile(

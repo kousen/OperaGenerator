@@ -71,7 +71,7 @@ public class IntegratedOperaGenerator {
             System.out.printf("📖 Opera Title: %s%n", opera.title());
             System.out.printf("🎬 Total Scenes: %d%n", opera.scenes().size());
             System.out.printf("📁 Libretto File: %s%n", librettoPath.getFileName());
-            System.out.println("🖼️  Individual scene files and illustrations created in src/main/resources/");
+            System.out.println("🖼️  Individual scene files and illustrations created in production_runs/");
 
             // List the generated files
             System.out.println("\n📋 Generated Files:");
