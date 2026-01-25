@@ -361,7 +361,8 @@ public class AgenticOperaGenerator {
      * Main entry point for demonstration.
      * <p>
      * Usage:
-     *   java AgenticOperaGenerator                                    # Agentic mode (default)
+     *   java AgenticOperaGenerator                                    # Agentic mode, 2 scenes, default premise
+     *   java AgenticOperaGenerator 5                                  # Agentic mode, 5 scenes, default premise
      *   java AgenticOperaGenerator "Create a 3-scene opera about X"   # Agentic mode, custom request
      *   java AgenticOperaGenerator --manual                           # Manual mode, 5 scenes
      *   java AgenticOperaGenerator --manual "Title" 3                 # Manual mode, custom title, 3 scenes
@@ -395,15 +396,21 @@ public class AgenticOperaGenerator {
             generator.runProductionWorkflow();
         } else {
             // AGENTIC MODE (default) - supervisor decides everything
-            String request = args.length > 0
-                    ? args[0]
-                    : "Create a 2-scene opera about the struggle between AI and human creativity. " +
-                      "Use alternating writing styles. After the scenes are complete, run the full production workflow.";
-
             System.out.println("🤖 AGENTIC MODE: Supervisor decides everything");
             System.out.println();
 
-            String result = generator.generateOperaAutonomously(request);
+            String result;
+            if (args.length == 0) {
+                // Default: 2 scenes with default premise
+                result = generator.generateOperaAutonomously(2);
+            } else if (args[0].matches("\\d+")) {
+                // Numeric arg: scene count with default premise
+                int numberOfScenes = Integer.parseInt(args[0]);
+                result = generator.generateOperaAutonomously(numberOfScenes);
+            } else {
+                // String arg: custom request
+                result = generator.generateOperaAutonomously(args[0]);
+            }
 
             System.out.println();
             System.out.println("─".repeat(60));
