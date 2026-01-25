@@ -315,3 +315,165 @@ WARNING: A restricted method in java.lang.System has been called
 WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader...
 ```
 This is a Gradle 9.x + Java 21+ infrastructure issue. The warning comes from Gradle's launcher before any configuration is read. It's harmless and will be fixed in future Gradle versions.
+
+---
+
+## Embabel Branch
+
+The `embabel` branch demonstrates the Embabel Agent Framework for building goal-oriented AI agent systems using GOAP (Goal Oriented Action Planning).
+
+### Current Status
+
+✅ **Manual mode works** - Full opera generation and production workflow
+⚠️ **Agentic mode has issues** - GOAP planner cannot chain actions across multiple agents
+
+**Successfully tested:**
+- "Vines of Hartford, Arias of Steel" - 3-scene opera with full production
+
+### Architecture
+
+Uses a **GOAP-based planning** approach where the planner determines action sequences:
+
+```
+┌────────────────────────────────────┐
+│        GOAP PLANNER                │
+│   (Plans action sequences)         │
+└──────────────┬─────────────────────┘
+               │
+    ┌──────────┼──────────┐
+    ▼          ▼          ▼
+┌────────────┐ ┌────────────┐ ┌────────────────┐
+│ Scene      │ │ Scene      │ │ Production     │
+│ Stages     │ │ Stages     │ │ Stages         │
+│ (GPT-5)    │ │ (Claude)   │ │ (utilities)    │
+└────────────┘ └────────────┘ └────────────────┘
+```
+
+### Key Embabel Files
+
+```
+src/main/java/com/kousenit/
+├── OperaApplication.java           # Spring Boot entry point
+├── embabel/
+│   ├── OperaSceneStages.java       # @Agent for scene generation with alternating models
+│   ├── OperaProductionStages.java  # @Agent for production workflow
+│   └── OperaShellCommands.java     # Spring Shell CLI commands
+└── (utility classes unchanged)
+```
+
+### Running via Spring Shell
+
+```bash
+# Build the jar
+./gradlew bootJar
+
+# Start Spring Shell (recommended - proper interactive terminal)
+java -jar build/libs/OperaGenerator-1.0.jar
+
+# Alternative: Gradle bootRun (may have terminal issues)
+./gradlew bootRun --console=plain -q
+```
+
+**MANUAL MODE** (recommended - works reliably):
+```
+embabel> generate-opera                    # Generate 3 scenes (default)
+embabel> generate-opera -t "My Opera" -s 5 # Custom title and 5 scenes
+embabel> run-production                    # Run production after generation
+embabel> full-manual -t "Opera" -s 3       # Generate and produce in one command
+```
+
+**AGENTIC MODE** (has GOAP planning issues - not yet working):
+```
+embabel> create-opera -s 3                 # Agentic 3-scene opera
+embabel> create-opera-simple -r "Create a 2-scene opera about love"
+```
+
+**UTILITIES**:
+```
+embabel> status                            # Show current opera status
+embabel> default-premise                   # Show the default premise
+embabel> help-opera                        # Show all opera commands
+embabel> exit                              # Exit the shell
+```
+
+### Key Implementation Details
+
+**Available models** (from Embabel's model registry):
+- OpenAI: `gpt-5`, `gpt-5-mini`, `gpt-5-nano`, `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`
+- Anthropic: `claude-opus-4-1`, `claude-opus-4-0`, `claude-sonnet-4-5`, `claude-sonnet-4-0`, `claude-haiku-4-5`
+
+**Important**: GPT-5 models only support `temperature = 1.0`
+
+**Alternating model pattern** (`OperaSceneStages.java`):
+```java
+private static final String GPT_MODEL = "gpt-5";
+private static final String CLAUDE_MODEL = "claude-opus-4-1";
+
+@Action(description = "Write the next opera scene using alternating AI models")
+public SceneGenerationState writeNextScene(SceneGenerationState state, OperationContext context) {
+    int sceneNumber = state.nextSceneNumber();
+    boolean useGpt = (sceneNumber % 2 == 1);  // Odd scenes use GPT
+    String modelName = useGpt ? GPT_MODEL : CLAUDE_MODEL;
+
+    // GPT-5 only supports temperature = 1.0; Claude supports variable temperature
+    Ai aiToUse = (context != null) ? context.ai() : ai;
+    double temperature = useGpt ? 1.0 : 0.8;
+    String sceneContent = aiToUse
+            .withLlm(LlmOptions.withModel(modelName).withTemperature(temperature))
+            .generateText(prompt);
+
+    return state.withScene(Opera.Scene.parse(sceneNumber, sceneContent, modelDisplayName));
+}
+```
+
+**Embabel annotations used**:
+- `@Agent` - Marks a class as an agent component
+- `@Action` - Marks a method as an action the planner can invoke
+- `@AchievesGoal` - Marks actions that achieve specific goals
+
+**Domain records for blackboard pattern**:
+- `SceneGenerationRequest` - Initial request with title, premise, scene count
+- `SceneGenerationState` - Accumulated state during scene generation
+- `ProductionState` - Production workflow state with completion flags
+
+### Dependencies
+
+```kotlin
+val embabelVersion = "0.3.2"
+
+dependencies {
+    implementation("com.embabel.agent:embabel-agent-starter:$embabelVersion")
+    implementation("com.embabel.agent:embabel-agent-starter-openai:$embabelVersion")
+    implementation("com.embabel.agent:embabel-agent-starter-anthropic:$embabelVersion")
+    implementation("com.embabel.agent:embabel-agent-starter-shell:$embabelVersion")
+}
+```
+
+### Differences from langchain4j-agentic Branch
+
+| Aspect | langchain4j-agentic | Embabel |
+|--------|---------------------|---------|
+| Planning | Supervisor agent decides | GOAP planner decides |
+| Framework | LangChain4j experimental | Embabel Agent Framework |
+| Entry point | Main method | Spring Shell |
+| Configuration | Java code | YAML + annotations |
+| Agent definition | Interface + builder | @Agent annotation |
+| Model switching | ChatModel instances | LlmOptions.withModel() |
+
+### Known Issues (Embabel Branch)
+
+1. **Agentic mode GOAP planning fails** - The planner cannot chain actions across `OperaSceneStages` and `OperaProductionStages`. Use manual mode instead.
+
+2. **Spring Shell terminal** - Running via `./gradlew bootRun` creates a "dumb terminal". Use `java -jar build/libs/OperaGenerator-1.0.jar` for proper interactive shell.
+
+3. **Logback/Spring Shell conflict** - Resolved by moving logs to `logs/` directory. The shell history file was conflicting with logback's `opera-generator.log`.
+
+### Utility Classes (Unchanged)
+
+These utility classes work with both branches:
+- `GeminiImageGenerator.java` - Gemini Nano Banana image generation
+- `LibrettoWriter.java` - Libretto formatting and saving
+- `NarratorVoice.java` - ElevenLabs audio narration
+- `AudioPlayer.java` - JLayer audio playback
+- `OperaCritic.java` - Gemini critique generation (uses Google GenAI SDK)
+- `ExternalToolsPreparer.java` - Suno/NotebookLM export packages

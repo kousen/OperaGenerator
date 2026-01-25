@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: opera-generator
+
+  ai:
+    # OpenAI Configuration (GPT-5.2 for odd scenes)
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-5.2
+          temperature: 0.8
+          max-tokens: 4096
+
+    # Anthropic Configuration (Claude Opus 4.5 for even scenes)
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+      chat:
+        options:
+          model: claude-opus-4-5-20251101
+          temperature: 0.8
+          max-tokens: 4096
+
+# Embabel Platform Configuration
+embabel:
+  agent:
+    platform:
+      process-type: CONCURRENT
+      autonomy:
+        goal-confidence-cutoff: 0.7
+        agent-confidence-cutoff: 0.6
+
+    # Role-based model selection
+    models:
+      default-llm: gpt-5.2
+      llms:
+        gpt-writer: gpt-5.2
+        claude-writer: claude-opus-4-5-20251101
+        supervisor: claude-opus-4-5-20251101
+
+    # Retry configuration for API calls
+    platform.models:
+      openai:
+        max-attempts: 3
+        backoff-millis: 2000
+      anthropic:
+        max-attempts: 3
+        backoff-millis: 2000
+
+  # Shell configuration
+  shell:
+    interactive:
+      enabled: true
+    history:
+      name: .embabel_history
+
+# Application-specific settings
+opera:
+  output:
+    base-directory: src/main/resources
+  image:
+    max-concurrent: 2
+    delay-ms: 1000
+
+# Logging configuration
+logging:
+  level:
+    com.kousenit: DEBUG
+    com.embabel: INFO
+    org.springframework: WARN

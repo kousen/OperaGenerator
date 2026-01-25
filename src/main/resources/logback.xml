@@ -9,9 +9,9 @@
 
     <!-- File appender for detailed logs -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>opera-generator.log</file>
+        <file>logs/opera-generator.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>opera-generator.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logs/opera-generator.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -26,8 +26,8 @@
     <logger name="com.kousenit.Conversation" level="DEBUG"/>
     <logger name="com.kousenit.OperaImageGenerator" level="DEBUG"/>
 
-    <!-- LangChain4j loggers -->
-    <logger name="dev.langchain4j" level="INFO"/>
+    <!-- Embabel loggers -->
+    <logger name="com.embabel" level="INFO"/>
 
     <!-- Reduce noise from HTTP clients -->
     <logger name="java.net.http" level="WARN"/>

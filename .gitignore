@@ -82,6 +82,10 @@ secrets.properties
 logs/
 *.log
 
+# Spring Shell history
+.embabel_history
+opera-generator.log
+
 # Test reports
 test-results/
 reports/
