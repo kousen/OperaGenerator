@@ -17,20 +17,19 @@ import java.util.regex.Pattern;
 
 /**
  * Agentic Opera Generator - demonstrates langchain4j-agentic patterns.
- *
+ * <p>
  * This class showcases TWO approaches for educational comparison:
- *
+ * <p>
  * 1. MANUAL ORCHESTRATION (generateOpera + runProductionWorkflow):
  *    - Your code explicitly controls the sequence of operations
  *    - Predictable, debuggable, but inflexible
- *
+ * <p>
  * 2. TRUE AGENTIC (generateOperaAutonomously):
  *    - The supervisor agent DECIDES what to do and when
  *    - The LLM plans, executes, and adapts autonomously
  *    - Demonstrates the power of agentic AI systems
- *
- * For educational demonstrations at conferences and training courses.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class AgenticOperaGenerator {
     private static final Logger logger = LoggerFactory.getLogger(AgenticOperaGenerator.class);
     private static final Pattern SCENE_PATTERN = Pattern.compile(
@@ -54,14 +53,16 @@ public class AgenticOperaGenerator {
                 .agentBuilder(SceneWriterAgent.class)
                 .chatModel(AiModels.GPT_5_2)
                 .name("gptSceneWriter")
-                .description("Writes opera scenes using GPT-5.2 with a creative, dramatic style")
+                .description("""
+                    Writes opera scenes using GPT-5.2 with a creative, dramatic style""")
                 .build();
 
         this.claudeWriter = AgenticServices
                 .agentBuilder(SceneWriterAgent.class)
                 .chatModel(AiModels.CLAUDE_OPUS_4_5)
                 .name("claudeSceneWriter")
-                .description("Writes opera scenes using Claude Opus 4.5 with a lyrical, nuanced style")
+                .description("""
+                    Writes opera scenes using Claude Opus 4.5 with a lyrical, nuanced style""")
                 .build();
 
         // Create production agent with access to tools
@@ -69,14 +70,15 @@ public class AgenticOperaGenerator {
                 .agentBuilder(ProductionAgent.class)
                 .chatModel(supervisorModel)
                 .name("productionAgent")
-                .description("Handles production tasks: saving libretto, generating images, narration, critique")
+                .description("""
+                    Handles production tasks: saving libretto, generating images,
+                    narration, critique""")
                 .tools(operaTools)
                 .build();
 
         // Build the TRUE agentic supervisor
         // This supervisor AUTONOMOUSLY decides which agents to call and when
-        this.supervisor = AgenticServices
-                .supervisorBuilder()
+        this.supervisor = AgenticServices.supervisorBuilder()
                 .chatModel(supervisorModel)
                 .name("OperaSupervisor")
                 .description("Orchestrates the creation of complete AI-generated operas")
@@ -95,16 +97,22 @@ public class AgenticOperaGenerator {
                         3. productionAgent - Handles production tasks including:
                            - registerScene: Register each scene after it's written
                            - buildOpera: Build the Opera object from registered scenes
-                           - saveLibretto, generateAllImages, generateNarration, generateCritique, prepareExports
+                           - saveLibretto, generateAllImages, generateNarration,
+                           generateCritique, prepareExports
 
                         WORKFLOW (follow this exact sequence):
                         1. Write Scene 1 with gptSceneWriter
-                        2. Call productionAgent with: "Register scene 1 with the following COMPLETE content: [paste ENTIRE scene here]. Author: GPT-5.2"
+                        2. Call productionAgent with: "Register scene 1 with the
+                            following COMPLETE content: [paste ENTIRE scene here].
+                            Author: GPT-5.2"
                         3. Write Scene 2 with claudeSceneWriter
-                        4. Call productionAgent with: "Register scene 2 with the following COMPLETE content: [paste ENTIRE scene here]. Author: Claude Opus 4.5"
+                        4. Call productionAgent with: "Register scene 2 with the
+                            following COMPLETE content: [paste ENTIRE scene here].
+                            Author: Claude Opus 4.5"
                         5. Continue alternating until all scenes are written and registered
                         6. Call productionAgent to buildOpera(title, premise)
-                        7. Call productionAgent to run the full production workflow (saveLibretto, generateAllImages, etc.)
+                        7. Call productionAgent to run the full production workflow
+                            (saveLibretto, generateAllImages, etc.)
 
                         CRITICAL REQUIREMENTS:
                         - You MUST pass the COMPLETE scene text to registerScene, not a summary
@@ -122,8 +130,27 @@ public class AgenticOperaGenerator {
     // ========================================================================
 
     /**
-     * Generate an opera using TRUE agentic orchestration.
+     * Generate an opera using TRUE agentic orchestration with the default premise.
+     * <p>
+     * Uses the classic opera premise from {@link Conversation#defaultPremise()}.
      *
+     * @return The supervisor's summary of what was accomplished
+     */
+    public String generateOperaAutonomously() {
+        String defaultRequest = String.format("""
+                Create a 2-scene opera with the following premise:
+
+                %s
+
+                Use alternating writing styles between scenes.
+                After the scenes are complete, run the full production workflow.""",
+                Conversation.defaultPremise());
+        return generateOperaAutonomously(defaultRequest);
+    }
+
+    /**
+     * Generate an opera using TRUE agentic orchestration.
+     * <p>
      * The supervisor agent autonomously:
      * - Plans the workflow
      * - Decides which scene writer to use for each scene
@@ -331,7 +358,7 @@ public class AgenticOperaGenerator {
 
     /**
      * Main entry point for demonstration.
-     *
+     * <p>
      * Usage:
      *   java AgenticOperaGenerator                                    # Agentic mode (default)
      *   java AgenticOperaGenerator "Create a 3-scene opera about X"   # Agentic mode, custom request
