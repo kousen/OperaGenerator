@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class OperaImageGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OperaImageGenerator.class);
-    static String RESOURCE_PATH = "src/main/resources"; // Package-private for testing
+    static String RESOURCE_PATH = "production_runs"; // Package-private for testing
 
     // Rate limiting configuration (configurable via system properties or environment variables)
     private static final int MAX_CONCURRENT_REQUESTS = getMaxConcurrentRequests();
