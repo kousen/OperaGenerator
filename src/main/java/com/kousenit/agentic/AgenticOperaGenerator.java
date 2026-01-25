@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Agentic Opera Generator - demonstrates langchain4j-agentic patterns.
@@ -32,8 +30,6 @@ import java.util.regex.Pattern;
 @SuppressWarnings("FieldCanBeLocal")
 public class AgenticOperaGenerator {
     private static final Logger logger = LoggerFactory.getLogger(AgenticOperaGenerator.class);
-    private static final Pattern SCENE_PATTERN = Pattern.compile(
-            "Scene\\s+(\\d+):\\s*(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE);
 
     private final OperaTools operaTools;
     private final SceneWriterAgent gptWriter;
@@ -259,7 +255,7 @@ public class AgenticOperaGenerator {
             );
 
             // Parse the scene
-            Opera.Scene scene = parseScene(sceneNumber, sceneContent, modelName);
+            Opera.Scene scene = Opera.Scene.parse(sceneNumber, sceneContent, modelName);
             scenes.add(scene);
 
             // Add to context for next scene
@@ -296,27 +292,6 @@ public class AgenticOperaGenerator {
                 .trim();
 
         return title.isEmpty() ? "The Opera of Hartford" : title;
-    }
-
-    /**
-     * Parse scene content into a Scene object.
-     */
-    private Opera.Scene parseScene(int expectedNumber, String content, String author) {
-        Matcher matcher = SCENE_PATTERN.matcher(content);
-
-        if (matcher.find()) {
-            int number = expectedNumber;
-            try {
-                number = Integer.parseInt(matcher.group(1));
-            } catch (NumberFormatException e) {
-                // Use expected number
-            }
-            String title = matcher.group(2).trim();
-            String sceneContent = content.substring(matcher.end()).trim();
-            return new Opera.Scene(number, title, author, sceneContent);
-        }
-
-        return new Opera.Scene(expectedNumber, "Untitled Scene " + expectedNumber, author, content);
     }
 
     /**
