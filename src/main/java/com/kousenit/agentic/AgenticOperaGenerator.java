@@ -134,17 +134,18 @@ public class AgenticOperaGenerator {
      * <p>
      * Uses the classic opera premise from {@link Conversation#defaultPremise()}.
      *
+     * @param numberOfScenes The number of scenes to generate
      * @return The supervisor's summary of what was accomplished
      */
-    public String generateOperaAutonomously() {
+    public String generateOperaAutonomously(int numberOfScenes) {
         String defaultRequest = String.format("""
-                Create a 2-scene opera with the following premise:
+                Create a %d-scene opera with the following premise:
 
                 %s
 
                 Use alternating writing styles between scenes.
                 After the scenes are complete, run the full production workflow.""",
-                Conversation.defaultPremise());
+                numberOfScenes, Conversation.defaultPremise());
         return generateOperaAutonomously(defaultRequest);
     }
 
