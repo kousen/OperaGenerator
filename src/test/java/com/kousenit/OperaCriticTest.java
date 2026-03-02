@@ -13,6 +13,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OperaCriticTest {
 
     @Test
+    void testCritiqueVinesOfReckoningOpera() throws Exception {
+        // Given
+        OperaCritic critic = new OperaCritic();
+        Path operaDir = Path.of("src/main/resources/the_vines_of_reckoning_a_connecticut_jungle_opera");
+        String operaTitle = "The Vines of Reckoning: A Connecticut Jungle Opera";
+
+        // When
+        System.out.println("Generating critique for The Vines of Reckoning...\n");
+        critic.reviewAndSave(operaDir, operaTitle);
+
+        // Then
+        Path critiquePath = operaDir.resolve("the_vines_of_reckoning_a_connecticut_jungle_opera_critique.md");
+        assertThat(critiquePath).exists();
+
+        System.out.println("\nCritique successfully generated and saved!");
+    }
+
+    @Test
     void testCritiqueHartfordOpera() throws Exception {
         // Given
         OperaCritic critic = new OperaCritic();

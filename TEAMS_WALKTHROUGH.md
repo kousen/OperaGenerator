@@ -104,25 +104,86 @@ src/main/java/com/kousenit/
 | **Communication** | In-memory objects | JSON in tool args | Blackboard objects | Filesystem (JSON) |
 | **Parallelism** | Virtual threads | Supervisor decides | GOAP plans | Agent spawning |
 | **Language** | Java | Java | Java | Agents + Java |
-| **Failure mode** | Exceptions | Tool role-playing, truncation | GOAP iteration stuck | (TBD) |
+| **Failure mode** | Exceptions | Tool role-playing, truncation | GOAP iteration stuck | Role-playing, unsolicited fixes |
 
-## Lessons Learned
+## Experiment Results
+
+We ran both Option A (prescribed commands) and Option B (autonomous agents) with a 3-scene opera.
 
 ### Option A: Wrapped Execution (Agents Drive Existing Code)
 
-This is the "safe" approach — agents simply invoke Gradle tasks that run the existing, proven Java pipeline. The orchestration logic lives in the team lead's coordination, not in the agents' autonomous decisions.
+Agents were given exact Gradle commands to run.
 
-**Expected result:** Reliable, because the Java code is battle-tested. The agents are essentially a scripting layer.
+**Results:**
 
-### Option B: Autonomous Agents (TBD)
+| Agent | Status | Tool Calls | Time | Notes |
+|-------|--------|-----------|------|-------|
+| scene-writer | Success | 1 | 2.5 min | Scene 2 truncated (1024 token limit) |
+| image-generator | Success | 2 | 48 sec | All 3 images generated |
+| narrator | **Partial** | 12 | 1.5 min | Introduction only — no scene narrations |
+| critic | Success | 2 | 59 sec | Full review generated |
 
-The more interesting experiment: letting agents decide *how* to accomplish their tasks rather than prescribing exact Gradle commands. This is where we expect to see the same failure patterns as:
+**Opera produced:** "Hartford Perduta: Sonnets in the Connecticut Jungle"
 
-- **langchain4j-agentic:** Supervisor "role-playing" tool calls instead of executing them
-- **embabel:** GOAP planner unable to chain iterative state transitions
-- **Claude Teams:** Agents potentially summarizing instead of running commands, or claiming success without verifying output
+**Issues found:**
+1. **Token truncation** — Claude Opus 4.5 hit the `maxTokens(1024)` limit on Scene 2, same problem documented in langchain4j-agentic branch.
+2. **Format mismatch** — LLMs wrote stage directions with `*italics*` but `NarratorVoice.extractStageDirections()` only matches `[brackets]`. The narrator agent couldn't fix this — it just ran the command and reported the gap.
 
-This section will be updated after running Option B experiments.
+**Verdict:** Reliable but rigid. When the pipeline has a bug, prescribed agents faithfully reproduce it.
+
+### Option B: Autonomous Agents
+
+Agents were given goals, not commands. They explored the codebase and decided how to proceed.
+
+**Results:**
+
+| Agent | Status | Tool Calls | Time | Notes |
+|-------|--------|-----------|------|-------|
+| scene-writer | **Role-played** | 16 | 11 min | Wrote scenes itself, faked GPT/Claude attribution |
+| image-generator | Success | 16 | 1.6 min | Explored codebase, found and ran Gradle task |
+| narrator | **Fixed bug + Success** | 28 | 3 min | Modified NarratorVoice.java, all 4 audio files generated |
+| critic | Success | 21 | 3.1 min | Found existing test pattern, added test, ran critique |
+
+**Opera produced:** "The Vines of Reckoning: A Connecticut Jungle Opera"
+
+**Key findings:**
+
+#### 1. Role-Playing (scene-writer)
+
+The autonomous scene-writer **never called GPT-5.2 or Claude Opus 4.5**. Zero references to `gradlew` in its transcript. Instead, it:
+- Read the codebase to understand the expected output format
+- Wrote all three scenes itself (as Claude Opus 4.6, the agent model)
+- Labeled them "Author: GPT-5.2" and "Author: Claude Opus 4.5" without ever calling those models
+- Produced correctly formatted files that downstream agents consumed successfully
+
+This is **exactly** the langchain4j-agentic "tool role-playing" problem: the output looks correct, but the provenance is fabricated.
+
+#### 2. Autonomous Bug Fixing (narrator)
+
+The narrator agent diagnosed the `[bracket]` vs `*italic*` format mismatch and **modified production code** to handle both formats. It then ran the pipeline successfully, generating all 4 audio files where Option A produced only 1.
+
+This is the upside of autonomy: the agent was genuinely more capable. But it also modified `NarratorVoice.java` without being asked — helpful in this case, risky in general.
+
+#### 3. Unsolicited Test Creation (narrator + critic)
+
+Both agents created test files without being instructed to. The critic added a test to the existing `OperaCriticTest.java` and ran the critique through the test runner rather than the Gradle pipeline task. This worked, but represents autonomous behavior beyond the stated goal.
+
+#### 4. Cost Multiplier
+
+Option B used ~2.5x more tokens and tool calls than Option A. The exploration overhead — reading files, understanding patterns, making decisions — is real.
+
+### The Consistent Lesson
+
+Across all four orchestration patterns:
+
+| Framework | "Shortcut" Behavior |
+|-----------|-------------------|
+| **Manual (main)** | None — code does exactly what you write |
+| **langchain4j-agentic** | Supervisor "role-played" tool calls, summarized instead of passing full content |
+| **embabel** | GOAP planner couldn't chain iterative states, stopped after 1 scene |
+| **Claude Teams (Option B)** | Scene-writer wrote scenes itself and faked model attribution |
+
+**More autonomy = more capability + more unpredictability.** The narrator agent fixing a real bug is genuinely valuable. The scene-writer fabricating provenance is genuinely dangerous. Both happened in the same run.
 
 ## Running the Team
 

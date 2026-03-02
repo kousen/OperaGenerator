@@ -142,15 +142,68 @@ public class NarratorVoice {
     
     private String extractStageDirections(String content) {
         StringBuilder directions = new StringBuilder();
+
+        // Extract [bracketed] stage directions (single-line)
         String[] lines = content.split("\n");
-        
         for (String line : lines) {
             if (line.trim().startsWith("[") && line.trim().endsWith("]")) {
                 if (!directions.isEmpty()) directions.append(" ");
                 directions.append(line.trim(), 1, line.trim().length() - 1);
             }
         }
-        
+
+        // Also extract *italic* stage directions (multi-line blocks starting with *)
+        // This handles the common opera format where stage directions are in *italics*
+        if (directions.isEmpty()) {
+            boolean inStageDirection = false;
+            StringBuilder currentBlock = new StringBuilder();
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (trimmed.startsWith("*") && !trimmed.startsWith("###")) {
+                    // Start or continue a stage direction block
+                    if (!inStageDirection) {
+                        inStageDirection = true;
+                        currentBlock = new StringBuilder();
+                    }
+                    // Strip leading/trailing * and add content
+                    String cleaned = trimmed.replaceAll("^\\*+|\\*+$", "").trim();
+                    if (!cleaned.isEmpty()) {
+                        if (!currentBlock.isEmpty()) currentBlock.append(" ");
+                        currentBlock.append(cleaned);
+                    }
+                    // Check if this line ends the block
+                    if (trimmed.endsWith("*") && trimmed.length() > 1) {
+                        if (!directions.isEmpty()) directions.append(" ");
+                        directions.append(currentBlock);
+                        inStageDirection = false;
+                    }
+                } else if (inStageDirection) {
+                    // Continue multi-line stage direction
+                    String cleaned = trimmed.replaceAll("^\\*+|\\*+$", "").trim();
+                    if (!cleaned.isEmpty()) {
+                        if (!currentBlock.isEmpty()) currentBlock.append(" ");
+                        currentBlock.append(cleaned);
+                    }
+                    if (trimmed.endsWith("*")) {
+                        if (!directions.isEmpty()) directions.append(" ");
+                        directions.append(currentBlock);
+                        inStageDirection = false;
+                    }
+                }
+            }
+
+            // Limit to first few stage directions to keep narration reasonable
+            String result = directions.toString();
+            if (result.length() > 800) {
+                result = result.substring(0, 800);
+                int lastPeriod = result.lastIndexOf('.');
+                if (lastPeriod > 400) {
+                    result = result.substring(0, lastPeriod + 1);
+                }
+            }
+            return result;
+        }
+
         return directions.toString();
     }
 }
