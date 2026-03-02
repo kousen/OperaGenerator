@@ -90,3 +90,34 @@ tasks.register<Test>("expensiveTest") {
     }
     description = "Run expensive tests (full opera generation)"
 }
+
+// ── Claude Code Teams pipeline steps ──────────────────────────────────
+// Each step can be run independently by a team agent.
+
+fun createPipelineTask(name: String, description: String) =
+    tasks.register<JavaExec>(name) {
+        this.description = description
+        group = "pipeline"
+        classpath = sourceSets.main.get().runtimeClasspath
+        mainClass.set("com.kousenit.PipelineSteps")
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
+
+        // Pass Gradle project properties as program arguments
+        args = when (name) {
+            "generateScenes" -> listOfNotNull(
+                project.findProperty("operaTitle") as String? ?: "",
+                project.findProperty("sceneCount") as String? ?: "5"
+            )
+            else -> listOfNotNull(
+                project.findProperty("operaJson") as String? ?: ""
+            )
+        }
+
+        // Route to the correct step method via system property
+        systemProperty("pipeline.step", name)
+    }
+
+createPipelineTask("generateScenes", "Generate opera scenes with alternating AI models")
+createPipelineTask("generateImages", "Generate illustrations with Gemini Nano Banana")
+createPipelineTask("generateNarration", "Generate audio narration with ElevenLabs")
+createPipelineTask("generateCritique", "Generate critical review with Gemini 3 Pro")
