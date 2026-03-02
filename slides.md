@@ -14,7 +14,7 @@ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
 ## <span style="color: #fbbf24; font-size: 1.2em;">Experiments with Multi-Agent AI</span>
 
 <div style="color: #e0f2fe; font-size: 1.1em; margin-top: 1.5em;">
-Three Orchestration Patterns<br/>
+Four Orchestration Patterns<br/>
 for Building AI-Powered Applications in Java
 </div>
 
@@ -34,10 +34,10 @@ background: 'linear-gradient(to bottom right, #1e293b, #334155)'
 Each AI model has unique strengths:
 
 - **<span style="color: #60a5fa;">GPT-5.2:</span>** Creative, fast, excellent at dialogue
-- **<span style="color: #a78bfa;">Claude Opus 4.5:</span>** Superior reasoning, thoughtful prose
+- **<span style="color: #a78bfa;">Claude Opus 4.6:</span>** Superior reasoning, thoughtful prose
 - **<span style="color: #34d399;">Gemini Nano Banana:</span>** Image generation capabilities
 - **<span style="color: #fbbf24;">ElevenLabs:</span>** Realistic voice narration
-- **<span style="color: #fb923c;">Gemini 3 Pro:</span>** Critical analysis and review
+- **<span style="color: #fb923c;">Gemini 3.1 Pro:</span>** Critical analysis and review
 
 <div style="margin-top: 1em; padding: 1em; background: rgba(251,191,36,0.1); border-radius: 8px; border: 2px solid #fbbf24;">
 <span style="color: #fbbf24;">The Challenge:</span> How do we orchestrate multiple AI models to build something complex?
@@ -183,13 +183,13 @@ background: 'linear-gradient(135deg, #065f46, #047857)'
 graph TB
     subgraph "Scene Writing"
         GPT["GPT-5.2<br/>(Odd Scenes)"]
-        Claude["Claude Opus 4.5<br/>(Even Scenes)"]
+        Claude["Claude Opus 4.6<br/>(Even Scenes)"]
     end
 
     subgraph "Production Pipeline"
         Gemini["Gemini Nano Banana<br/>(Image Generation)"]
         ElevenLabs["ElevenLabs<br/>(Dramatic Narration)"]
-        GeminiPro["Gemini 3 Pro<br/>(Critical Review)"]
+        GeminiPro["Gemini 3.1 Pro<br/>(Review)"]
     end
 
     GPT --> Libretto[Complete Libretto]
@@ -404,7 +404,7 @@ background: 'linear-gradient(135deg, #1e3a8a, #1e40af)'
 ```java
 public class Conversation {
     public final ChatModel gpt5 = AiModels.GPT_5_2;
-    public final ChatModel claude = AiModels.CLAUDE_OPUS_4_5;
+    public final ChatModel claude = AiModels.CLAUDE_OPUS_4_6;
 
     public Opera generateOpera(String title, int numberOfScenes) {
         ChatMemory memory = MessageWindowChatMemory
@@ -414,7 +414,7 @@ public class Conversation {
         for (int i = 1; i <= numberOfScenes; i++) {
             // Alternate between models
             ChatModel currentModel = (i % 2 == 1) ? gpt5 : claude;
-            String modelName = (i % 2 == 1) ? "GPT-5.2" : "Claude Opus 4.5";
+            String modelName = (i % 2 == 1) ? "GPT-5.2" : "Claude Opus 4.6";
 
             String sceneContent = currentModel.chat(memory,
                 buildPrompt(i, numberOfScenes));
@@ -452,7 +452,7 @@ public class IntegratedOperaGenerator {
         // Step 4: Generate illustrations (parallel with virtual threads)
         GeminiImageGenerator.generateImages(opera);
 
-        // Step 5: Generate critical review (Gemini 3 Pro)
+        // Step 5: Generate critical review (Gemini 3.1 Pro)
         OperaCritic.generateCritique(opera, operaDir);
     }
 }
@@ -584,7 +584,7 @@ this.gptWriter = AgenticServices.agentBuilder(SceneWriterAgent.class)
     .build();
 
 this.claudeWriter = AgenticServices.agentBuilder(SceneWriterAgent.class)
-    .chatModel(AiModels.CLAUDE_OPUS_4_5)
+    .chatModel(AiModels.CLAUDE_OPUS_4_6)
     .name("claudeSceneWriter")
     .build();
 
@@ -607,7 +607,7 @@ background: 'linear-gradient(135deg, #5b21b6, #7c3aed)'
 ```java
 // Build supervisor that orchestrates sub-agents
 this.supervisor = AgenticServices.supervisorBuilder()
-    .chatModel(AiModels.CLAUDE_OPUS_4_5_LARGE)  // 8192 tokens!
+    .chatModel(AiModels.CLAUDE_OPUS_4_6_LARGE)  // 8192 tokens!
     .subAgents(gptWriter, claudeWriter, productionAgent)
     .supervisorContext("""
         You orchestrate opera creation.
@@ -729,7 +729,7 @@ public static final ChatModel CLAUDE_OPUS_4_5 = AnthropicChatModel.builder()
     .maxTokens(1024)  // ❌ Truncates JSON with scene content
 
 // Supervisor needs room for structured data (agent selection + arguments)
-public static final ChatModel CLAUDE_OPUS_4_5_LARGE = AnthropicChatModel.builder()
+public static final ChatModel CLAUDE_OPUS_4_6_LARGE = AnthropicChatModel.builder()
     .maxTokens(8192)  // ✅ Fits full scene content in JSON payloads
 ```
 
@@ -1065,13 +1065,13 @@ background: 'linear-gradient(135deg, #92400e, #b45309)'
 
 <div style="font-size: 0.95em;">
 
-**The autonomous scene-writer never called GPT-5.2 or Claude Opus 4.5:**
+**The autonomous scene-writer never called GPT-5.2 or Claude Opus 4.6:**
 
 <v-clicks>
 
 - Explored codebase to understand expected file formats
 - **Wrote all three scenes itself** (as the agent model)
-- Labeled them "Author: GPT-5.2" and "Author: Claude Opus 4.5"
+- Labeled them "Author: GPT-5.2" and "Author: Claude Opus 4.6"
 - Output was correctly formatted — downstream agents consumed it fine
 - **Zero references to `gradlew`** in the entire transcript
 
@@ -1355,7 +1355,7 @@ background: 'linear-gradient(135deg, #1e3a8a, #1e40af)'
 <span style="color: #fef3c7;">
 • Java 21 + virtual threads<br/>
 • LangChain4j 1.10.0<br/>
-• GPT-5.2, Claude, Gemini<br/>
+• GPT-5.2, Claude Opus 4.6, Gemini 3.1<br/>
 • ElevenLabs narration
 </span>
 </div>
@@ -1380,7 +1380,7 @@ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)'
 📺 <a href="https://youtube.com/@talesfromthejarside" style="color: #60a5fa;">@talesfromthejarside</a>
 </div>
 <div style="text-align: left; color: #e0f2fe;">
-📝 <a href="https://kousenit.substack.com" style="color: #60a5fa;">kousenit.substack.com</a><br/>
+📝 <a href="https://substack.com/@talesfromthejarside" style="color: #60a5fa;">substack.com/@talesfromthejarside</a><br/>
 💼 <a href="https://linkedin.com/in/kenkousen" style="color: #60a5fa;">linkedin.com/in/kenkousen</a><br/>
 🦋 <a href="https://bsky.app/profile/kousenit.com" style="color: #60a5fa;">bsky.app/profile/kousenit.com</a>
 </div>
