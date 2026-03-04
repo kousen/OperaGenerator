@@ -45,14 +45,14 @@ class OperaGenerationIntegrationTest {
             Opera.Scene scene = opera.scenes().get(i);
             assertThat(scene.number()).isEqualTo(i + 1);
             assertThat(scene.title()).isNotEmpty();
-            assertThat(scene.author()).isIn("GPT-5.2", "Claude Opus 4.5");
+            assertThat(scene.author()).isIn("GPT-5.2", "Claude Opus 4.6");
             assertThat(scene.content()).isNotEmpty();
         }
 
         // Verify alternating authors
         if (numberOfScenes >= 2) {
             assertThat(opera.scenes().get(0).author()).isEqualTo("GPT-5.2");
-            assertThat(opera.scenes().get(1).author()).isEqualTo("Claude Opus 4.5");
+            assertThat(opera.scenes().get(1).author()).isEqualTo("Claude Opus 4.6");
         }
 
         System.out.printf("✅ Generated opera '%s' with %d scenes%n", opera.title(), opera.scenes().size());
@@ -62,7 +62,7 @@ class OperaGenerationIntegrationTest {
     void testLibrettoWriting() throws IOException {
         // Given
         Opera.Scene scene1 = new Opera.Scene(1, "Opening", "GPT-5.2", "The curtain rises...");
-        Opera.Scene scene2 = new Opera.Scene(2, "Encounter", "Claude Opus 4.5", "The characters meet...");
+        Opera.Scene scene2 = new Opera.Scene(2, "Encounter", "Claude Opus 4.6", "The characters meet...");
         Opera testOpera = new Opera("Test Libretto", "A test premise", List.of(scene1, scene2));
 
         // When - Save libretto
@@ -85,7 +85,7 @@ class OperaGenerationIntegrationTest {
                     .contains("> **Author: GPT-5.2**")
                     .contains("The curtain rises...")
                     .contains("### Scene 2: Encounter")
-                    .contains("> **Author: Claude Opus 4.5**")
+                    .contains("> **Author: Claude Opus 4.6**")
                     .contains("The characters meet...");
 
             System.out.println("✅ Libretto saved and verified: " + librettoPath.getFileName());

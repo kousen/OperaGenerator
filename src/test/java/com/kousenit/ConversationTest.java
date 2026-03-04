@@ -34,7 +34,7 @@ class ConversationTest {
         for (Opera.Scene scene : opera.scenes()) {
             assertThat(scene.number()).isPositive();
             assertThat(scene.title()).isNotEmpty();
-            assertThat(scene.author()).isIn("GPT-5.2", "Claude Opus 4.5");
+            assertThat(scene.author()).isIn("GPT-5.2", "Claude Opus 4.6");
             assertThat(scene.content()).isNotEmpty();
         }
         

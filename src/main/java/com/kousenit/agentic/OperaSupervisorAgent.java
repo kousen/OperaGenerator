@@ -13,7 +13,7 @@ import dev.langchain4j.service.UserMessage;
  *
  * Sub-agents available:
  * - gptSceneWriter: Writes opera scenes using GPT-5.2 (creative, dramatic style)
- * - claudeSceneWriter: Writes opera scenes using Claude Opus 4.5 (lyrical, nuanced style)
+ * - claudeSceneWriter: Writes opera scenes using Claude Opus 4.6 (lyrical, nuanced style)
  * - productionAgent: Handles production tasks (saving, images, narration, etc.)
  *
  * The supervisor uses these agents to fulfill requests like:
@@ -31,7 +31,7 @@ public interface OperaSupervisorAgent {
                - Creative, dramatic style
                - Call with: scene number, title, premise, previous scene context, instructions
 
-            2. claudeSceneWriter - Writes opera scenes using Claude Opus 4.5
+            2. claudeSceneWriter - Writes opera scenes using Claude Opus 4.6
                - Lyrical, nuanced style
                - Call with: scene number, title, premise, previous scene context, instructions
 

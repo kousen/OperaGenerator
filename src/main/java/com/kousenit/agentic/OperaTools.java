@@ -207,7 +207,7 @@ public class OperaTools {
     public String registerScene(
             @P("The scene number (1, 2, 3...)") int sceneNumber,
             @P("The full scene content as returned by the scene writer") String sceneContent,
-            @P("The name of the model that wrote this scene (e.g., 'GPT-5.2' or 'Claude Opus 4.5')") String authorModel) {
+            @P("The name of the model that wrote this scene (e.g., 'GPT-5.2' or 'Claude Opus 4.6')") String authorModel) {
 
         // Check for duplicate
         boolean exists = collectedScenes.stream()

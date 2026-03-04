@@ -14,7 +14,7 @@ public class IntegratedOperaGenerator {
             System.out.println("🎭 Starting Opera Generation Process...\n");
 
             // Step 1: Generate the opera with alternating AI models
-            System.out.println("📝 Step 1: Generating opera scenes with GPT-5.2 and Claude Opus 4.5...");
+            System.out.println("📝 Step 1: Generating opera scenes with GPT-5.2 and Claude Opus 4.6...");
             Conversation conversation = new Conversation();
             Opera opera = conversation.generateOpera(operaTitle, numberOfScenes);
 

@@ -65,7 +65,7 @@ public class ExternalToolsPreparer {
 
         // Add production notes
         combined.append("### Production Notes\n");
-        combined.append("- Generated using GPT-5.2 and Claude Opus 4.5 in alternating collaboration\n");
+        combined.append("- Generated using GPT-5.2 and Claude Opus 4.6 in alternating collaboration\n");
         combined.append("- Total scenes: ").append(opera.scenes().size()).append("\n");
         combined.append("- Setting: Post-apocalyptic Connecticut jungle\n\n");
 
@@ -158,7 +158,7 @@ public class ExternalToolsPreparer {
 
     private static String generateDiscussionPoints(Opera.Scene scene) {
         return """
-            - How does the AI collaboration between GPT-5.2 and Claude Opus 4.5 affect the narrative?
+            - How does the AI collaboration between GPT-5.2 and Claude Opus 4.6 affect the narrative?
             - What operatic conventions are being followed or subverted?
             - Analysis of the character dynamics in this scene
             - The role of the setting (post-apocalyptic Connecticut) in the drama
@@ -184,7 +184,7 @@ public class ExternalToolsPreparer {
             2. **Plot Overview** (3 min): Summary of %s
             3. **Scene Analysis** (10 min): Deep dive into key moments
             4. **Character Discussion** (5 min): Archetypes and development
-            5. **AI Collaboration** (5 min): How GPT-5.2 and Claude Opus 4.5 work together
+            5. **AI Collaboration** (5 min): How GPT-5.2 and Claude Opus 4.6 work together
             6. **Musical Possibilities** (3 min): How this would sound on stage
             7. **Thematic Exploration** (5 min): Major themes and metaphors
             8. **Conclusion** (2 min): The future of AI in creative arts

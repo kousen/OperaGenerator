@@ -41,7 +41,7 @@ public class AgenticOperaGenerator {
     public AgenticOperaGenerator() {
         this.operaTools = new OperaTools();
         // Use high-token model for supervisor - planner needs to pass large scene content in JSON
-        this.supervisorModel = AiModels.CLAUDE_OPUS_4_5_LARGE;
+        this.supervisorModel = AiModels.CLAUDE_OPUS_4_6_LARGE;
 
         // Create scene writers with different models for diversity
         // Using AgenticServices.agentBuilder() for supervisor compatibility
@@ -55,10 +55,10 @@ public class AgenticOperaGenerator {
 
         this.claudeWriter = AgenticServices
                 .agentBuilder(SceneWriterAgent.class)
-                .chatModel(AiModels.CLAUDE_OPUS_4_5)
+                .chatModel(AiModels.CLAUDE_OPUS_4_6)
                 .name("claudeSceneWriter")
                 .description("""
-                    Writes opera scenes using Claude Opus 4.5 with a lyrical, nuanced style""")
+                    Writes opera scenes using Claude Opus 4.6 with a lyrical, nuanced style""")
                 .build();
 
         // Create production agent with access to tools
@@ -87,7 +87,7 @@ public class AgenticOperaGenerator {
                         1. gptSceneWriter - Writes scenes using GPT-5.2
                            Use for odd-numbered scenes (1, 3, 5...)
 
-                        2. claudeSceneWriter - Writes scenes using Claude Opus 4.5
+                        2. claudeSceneWriter - Writes scenes using Claude Opus 4.6
                            Use for even-numbered scenes (2, 4, 6...)
 
                         3. productionAgent - Handles production tasks including:
@@ -104,7 +104,7 @@ public class AgenticOperaGenerator {
                         3. Write Scene 2 with claudeSceneWriter
                         4. Call productionAgent with: "Register scene 2 with the
                             following COMPLETE content: [paste ENTIRE scene here].
-                            Author: Claude Opus 4.5"
+                            Author: Claude Opus 4.6"
                         5. Continue alternating until all scenes are written and registered
                         6. Call productionAgent to buildOpera(title, premise)
                         7. Call productionAgent to run the full production workflow
@@ -237,7 +237,7 @@ public class AgenticOperaGenerator {
 
             // Alternate between GPT and Claude for diversity
             SceneWriterAgent writer = (i % 2 == 0) ? gptWriter : claudeWriter;
-            String modelName = (i % 2 == 0) ? "GPT-5.2" : "Claude Opus 4.5";
+            String modelName = (i % 2 == 0) ? "GPT-5.2" : "Claude Opus 4.6";
 
             String sceneInstructions = isFinalScene
                     ? "This is the FINAL scene. Tie off major plot threads, resolve the romantic arc, and deliver a decisive ending."

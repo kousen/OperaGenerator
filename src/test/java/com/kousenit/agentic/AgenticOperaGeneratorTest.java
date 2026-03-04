@@ -27,7 +27,7 @@ class AgenticOperaGeneratorTest {
         assertThat(opera).isNotNull();
         assertThat(opera.title()).isEqualTo("Test Agentic Opera");
         assertThat(opera.scenes()).hasSize(1);
-        assertThat(opera.scenes().getFirst().author()).isIn("GPT-5.2", "Claude Opus 4.5");
+        assertThat(opera.scenes().getFirst().author()).isIn("GPT-5.2", "Claude Opus 4.6");
         assertThat(opera.scenes().getFirst().content()).isNotEmpty();
 
         System.out.println("✅ Generated agentic opera: " + opera.title());
@@ -47,7 +47,7 @@ class AgenticOperaGeneratorTest {
 
         // Verify alternating models
         assertThat(opera.scenes().get(0).author()).isEqualTo("GPT-5.2");
-        assertThat(opera.scenes().get(1).author()).isEqualTo("Claude Opus 4.5");
+        assertThat(opera.scenes().get(1).author()).isEqualTo("Claude Opus 4.6");
 
         System.out.println("✅ Verified model diversity:");
         opera.scenes().forEach(scene ->

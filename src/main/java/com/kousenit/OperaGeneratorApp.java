@@ -232,7 +232,7 @@ public class OperaGeneratorApp implements Callable<Integer> {
         Set<String> models = new LinkedHashSet<>();
         models.add("OpenAI GPT-5.2 (libretto)");
         models.add("OpenAI GPT-5 Mini (synopsis)");
-        models.add("Anthropic Claude Opus 4.5 (libretto)");
+        models.add("Anthropic Claude Opus 4.6 (libretto)");
         if (!skipImages) {
             models.add("Google Gemini Nano Banana (illustrations)");
         }
